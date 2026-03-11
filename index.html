@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Eco! - PROTÓTIPO</title>
+    <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
+
+        :root {
+            --azul-dahj: #001f4d; 
+            --azul-botao: #00265e; 
+            --amarelo: #FFD700;
+            --bg: #f4f4f4;
+            --branco: #ffffff;
+            --ruido: rgba(100, 100, 100, 0.4); /* Cor do carimbo */
+        }
+
+        /* --- O RUÍDO: MARCA D'ÁGUA DE SEGURANÇA --- */
+        body::before {
+            content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO FICTÍCIO • MODELO PARA APRESENTAÇÃO";
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: #e0e0e0;
+            color: #777;
+            font-size: 10px;
+            text-align: center;
+            letter-spacing: 2px;
+            z-index: 9999;
+            padding: 3px 0;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .carimbo-exemplo {
+            position: fixed;
+            bottom: 80px;
+            right: -30px;
+            transform: rotate(-45deg);
+            background: none;
+            border: 4px double var(--ruido);
+            color: var(--ruido);
+            padding: 10px 50px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 9998;
+            pointer-events: none; /* Não atrapalha o clique */
+            letter-spacing: 5px;
+            opacity: 0.6;
+        }
+
+        /* --- RESTANTE DO LAYOUT --- */
+        body { 
+            margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
+            background: var(--bg); color: #333;
+            display: flex; flex-direction: column; min-height: 100vh;
+            padding-top: 18px; /* Espaço para a faixa de aviso no topo */
+        }
+
+        header {
+            width: 100%; padding: 60px 0; text-align: center;
+            background: url('bk0.png') no-repeat center center; 
+            background-size: cover;
+            border-bottom: 5px solid var(--amarelo);
+        }
+
+        .logo-dahj { width: 100px; }
+        header h1 { 
+            color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0;
+            letter-spacing: 2px;
+        }
+
+        .filter-bar {
+            background: var(--azul-dahj); padding: 12px;
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+            position: sticky; top: 18px; z-index: 1000;
+        }
+
+        .filter-btn {
+            background: var(--azul-botao); border: none; color: var(--branco);
+            padding: 8px 20px; border-radius: 4px; cursor: pointer; 
+            font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+            transition: 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active { background: var(--amarelo); color: var(--azul-dahj); }
+
+        .top-news {
+            max-width: 1100px; margin: 25px auto;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; padding: 0 20px;
+        }
+
+        .news-block {
+            background: var(--branco); padding: 25px; border-top: 5px solid var(--azul-dahj);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column;
+        }
+
+        .featured { grid-row: span 2; background: var(--azul-dahj); color: white; border-top: 5px solid var(--amarelo); }
+        .featured h2 { font-size: 2.2rem; color: var(--amarelo); margin: 10px 0 15px 0; line-height: 1.1; }
+
+        .container { max-width: 1100px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
+        
+        .card { 
+            background: var(--branco); padding: 25px; border-radius: 4px; margin-bottom: 15px;
+            border-left: 5px solid var(--azul-dahj); display: flex; flex-direction: column;
+        }
+
+        .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
+        .card p { margin: 10px 0; line-height: 1.5; color: #555; }
+        
+        .entidade-aluno { border-left-color: #00b894; }
+        .entidade-prof { border-left-color: #6c5ce7; }
+        .entidade-conv { border-left-color: #e17055; }
+
+        .btn-side {
+            display: block; background: var(--azul-botao); color: white;
+            text-align: center; padding: 15px; text-decoration: none; font-weight: bold;
+            border-radius: 4px; margin-bottom: 10px; transition: 0.3s;
+        }
+
+        .btn-side:hover { background: var(--amarelo); color: var(--azul-dahj); }
+
+        footer {
+            margin-top: auto; padding: 50px 0 20px 0; text-align: center; width: 100%; background-color: var(--branco);
+        }
+        .img-chapa-footer { width: 100px; }
+        .footer-text { font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold; }
+        .copyright { font-size: 0.7rem; color: #999; margin-top: 20px; }
+
+        @media (max-width: 850px) {
+            .top-news { grid-template-columns: 1fr; }
+            .container { grid-template-columns: 1fr; }
+            header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carimbo-exemplo">SEM VALOR</div>
+
+    <header>
+        <img src="logo-dahj.jpg" alt="DAHJ" class="logo-dahj">
+        <h1>O Eco!</h1>
+    </header>
+
+    <nav class="filter-bar">
+        <button class="filter-btn active" onclick="filterSelection('all')">Tudo</button>
+        <button class="filter-btn" onclick="filterSelection('dahj')">DAHJ</button>
+        <button class="filter-btn" onclick="filterSelection('aluno')">Aluno</button>
+        <button class="filter-btn" onclick="filterSelection('prof')">Professor</button>
+        <button class="filter-btn" onclick="filterSelection('conv')">Convidados</button>
+    </nav>
+
+    <section class="top-news">
+        <div class="news-block featured filter-item dahj">
+            <small>EDITORIAL POLÍTICO</small>
+            <h2>Democratizando a voz: Por que 'O Eco!' é mais que um jornal</h2>
+            <p>Diferente das redes sociais, onde o algoritmo decide quem fala, este espaço garante que a pauta do estudante de Economia tenha permanência e visibilidade real.</p>
+            <a href="#" style="color: var(--amarelo); font-weight: bold; text-decoration: none; margin-top: auto;">Leia nosso manifesto →</a>
+        </div>
+
+        <div class="news-block filter-item prof">
+            <small>ORGANIZAÇÃO</small>
+            <h3>Memória Institucional</h3>
+            <p>Centralizar documentos e informativos oficiais evita que pautas vitais se percam no caos do WhatsApp.</p>
+        </div>
+
+        <div class="news-block filter-item alu">
+            <small>ESTUDANTES</small>
+            <h3>Ocupação do Debate</h3>
+            <p>O jornal quebra o monopólio da fala. Aqui, o relato do aluno tem o mesmo peso da nota da coordenação.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <main id="feed">
+            <article class="card filter-item aluno entidade-aluno">
+                <small>ALUNO • 10 MAR</small>
+                <h2>A importância do relato discente na construção do curso</h2>
+                <p>Ninguém conhece melhor os gargalos do Bloco F do que quem senta nas cadeiras todos os dias. O Eco! nasce para ser o megafone dessa vivência.</p>
+            </article>
+
+            <article class="card filter-item dahj">
+                <small>DAHJ • 09 MAR</small>
+                <h2>Transparência e Luta: O benefício de uma comunicação estruturada</h2>
+                <p>O uso de um fluxo de redação organizado permite que a gestão foque na política, enquanto a informação flui de maneira clara.</p>
+            </article>
+        </main>
+
+        <aside>
+            <a href="index.html" class="btn-side">OUVIDORIA</a>
+            <a href="guia.html" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
+            <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
+                <strong>Aviso de Protótipo:</strong><br>
+                Este site é um modelo experimental desenvolvido para a chapa A Luta Faz Eco!
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <a href="https://www.instagram.com/dahjecouff/" target="_blank">
+            <img src="capa-chapa.jpg" alt="Chapa A Luta Faz Eco" class="img-chapa-footer">
+        </a>
+        <div class="footer-text">Chapa A Luta Faz Eco 2025-2026</div>
+        <div class="copyright">© A Luta Faz Eco 2026 | Economia UFF</div>
+    </footer>
+
+    <script>
+        function filterSelection(c) {
+            var x, i;
+            x = document.getElementsByClassName("filter-item");
+            if (c == "all") c = "";
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+                if (x[i].className.indexOf(c) > -1) {
+                    x[i].style.display = "flex";
+                }
+            }
+            var btns = document.getElementsByClassName("filter-btn");
+            for (var i = 0; i < btns.length; i++) {
+                btns[i].classList.remove("active");
+            }
+            if(event) event.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
