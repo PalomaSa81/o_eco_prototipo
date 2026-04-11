@@ -1,218 +1,159 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAHJ - Hub Digital</title>
-    
-    <meta name="theme-color" content="#001f4d">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
-
+    <title>O Eco! - Protótipo</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    
     <style>
+        /* --- SEU CSS ORIGINAL DO DAHJ --- */
         :root {
-            --azul-dahj: #001f4d; 
-            --azul-botao: #00265e; 
-            --amarelo: #FFD700;
-            --bg: #f4f4f4;
+            --azul-dahj: #003366;
+            --azul-claro: #e6f0ff;
             --branco: #ffffff;
+            --cinza: #f4f4f4;
+            --texto: #333;
         }
 
-        body::before {
-            content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO DINÂMICO • DAHJ UFF";
-            position: fixed; top: 0; width: 100%; background: #e0e0e0;
-            color: #777; font-size: 10px; text-align: center;
-            letter-spacing: 2px; z-index: 9999; padding: 3px 0;
-            font-weight: bold; border-bottom: 1px solid #ccc;
-        }
-
-        body { 
-            margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
-            background: var(--bg); color: #333;
-            display: flex; flex-direction: column; min-height: 100vh;
-            padding-top: 18px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cinza);
+            color: var(--texto);
         }
 
         header {
-            width: 100%; padding: 60px 0; text-align: center;
-            background: url('bk0.png') no-repeat center center; 
-            background-size: cover;
-            border-bottom: 5px solid var(--amarelo);
+            background-color: var(--azul-dahj);
+            color: var(--branco);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .logo-dahj { width: 100px; }
-        header h1 { 
-            color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0;
-            letter-spacing: 2px;
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
 
-        .filter-bar {
-            background: var(--azul-dahj); padding: 12px;
-            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
-            position: sticky; top: 18px; z-index: 1000;
+        /* Estilo dos Cards de Notícia */
+        article.card {
+            background: var(--branco);
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--azul-dahj);
         }
 
-        .filter-btn {
-            background: var(--azul-botao); border: none; color: var(--branco);
-            padding: 8px 20px; border-radius: 4px; cursor: pointer; 
-            font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
-            transition: 0.3s ease;
+        .card-meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
 
-        .filter-btn:hover, .filter-btn.active { background: var(--amarelo); color: var(--azul-dahj); }
-
-        .container { max-width: 1100px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
-        
-        .card { 
-            background: var(--branco); padding: 25px; border-radius: 4px; margin-bottom: 15px;
-            border-left: 5px solid var(--azul-dahj); display: flex; flex-direction: column;
-            animation: fadeIn 0.5s ease-in;
+        .card h2 {
+            margin: 0 0 15px 0;
+            color: var(--azul-dahj);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card-body {
+            line-height: 1.6;
         }
-
-        .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
-        .card-meta { font-size: 0.85rem; color: #777; margin-bottom: 10px; }
-        .card-body { line-height: 1.6; color: #444; overflow: hidden; }
-        
-        /* Estilização básica para o markdown renderizado */
-        .card-body p { margin-bottom: 10px; }
-        .card-body strong { color: #000; }
-
-        .btn-side {
-            display: block; background: var(--azul-botao); color: white;
-            text-align: center; padding: 15px; text-decoration: none; font-weight: bold;
-            border-radius: 4px; margin-bottom: 10px; transition: 0.3s;
-        }
-
-        .btn-side:hover { background: var(--amarelo); color: var(--azul-dahj); }
 
         footer {
-            margin-top: auto; padding: 50px 0 20px 0; text-align: center; width: 100%; background-color: var(--branco);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #666;
+            background: #ddd;
+            margin-top: 40px;
         }
-        .img-chapa-footer { width: 100px; }
-        .footer-text { font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold; }
-        .copyright { font-size: 0.7rem; color: #999; margin-top: 20px; }
 
-        @media (max-width: 850px) {
-            .container { grid-template-columns: 1fr; }
-            header h1 { font-size: 2.5rem; }
+        #loading {
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <img src="logo-dahj.jpg" alt="DAHJ" class="logo-dahj">
-        <h1>O Eco!</h1>
-    </header>
+<header>
+    <h1>📰 O Eco!</h1>
+    <p>Informativo do Diretório Acadêmico Hermann Júnior (UFF)</p>
+</header>
 
-    <nav class="filter-bar">
-        <button class="filter-btn active" onclick="filterSelection('all', event)">Tudo</button>
-        <button class="filter-btn" onclick="filterSelection('dahj', event)">DAHJ</button>
-        <button class="filter-btn" onclick="filterSelection('aluno', event)">Aluno</button>
-        <button class="filter-btn" onclick="filterSelection('prof', event)">Professor</button>
-    </nav>
+<div class="container" id="feed">
+    <div id="loading">Carregando as últimas notícias...</div>
+</div>
 
-    <div class="container">
-        <main id="feed">
-            <p style="padding: 20px;">Carregando notícias do Bloco F...</p>
-        </main>
+<footer>
+    &copy; 2026 DAHJ - Desenvolvido por Paloma de Sá
+</footer>
 
-        <aside>
-            <a href="https://dahj-uff.github.io/ouvidoria/" class="btn-side">OUVIDORIA</a>
-            <a href="#" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
-            <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
-                <strong>Portal DAHJ:</strong>
-                Este é um ambiente dinâmico integrado ao Google Drive.
-            </div>
-        </aside>
-    </div>
+<script>
+    // --- COLE SUA URL DO APPS SCRIPT AQUI ---
+    const URL_API = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
-    <footer>
-        <a href="https://www.instagram.com/dahjecouff/" target="_blank">
-            <img src="capa-chapa.jpg" alt="Chapa A Luta Faz Eco" class="img-chapa-footer">
-        </a>
-        <div class="footer-text">Diretório Acadêmico Hermann Júnior</div>
-        <div class="copyright">© 2026 | Economia UFF</div>
-    </footer>
-
-    <script>
-        // --- COLOQUE SUA URL DO APPS SCRIPT AQUI ---
-        const URL_API = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
-
-        async function carregarMaterias() {
-            const feed = document.getElementById('feed');
-            try {
-                const response = await fetch(URL_API);
-                const materias = await response.json();
-                
-                if (!materias || materias.length === 0) {
-                    feed.innerHTML = '<p style="padding:20px;">Nenhuma matéria publicada no momento.</p>';
-                    return;
-                }
-
-                feed.innerHTML = ''; 
-
-                materias.forEach(materia => {
-                    const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR');
-                    const card = document.createElement('article');
-                    
-                    // Define a categoria para o filtro
-                    const cat = materia.categoria || 'aluno';
-                    card.className = `card filter-item ${cat}`; 
-
-                    // Renderiza o Markdown para HTML
-                    const resumoMarkdown = materia.conteudo ? materia.conteudo.substring(0, 350) + "..." : "";
-                    const corpoHTML = marked.parse(resumoMarkdown);
-
-                    card.innerHTML = `
-                        <div class="card-meta">📅 ${dataFormatada} • Por: <strong>${materia.autor || 'Redação'}</strong></div>
-                        <h2>${materia.titulo}</h2>
-                        <div class="card-body">
-                            ${corpoHTML}
-                        </div>
-                        <a href="#" onclick="alert('Página completa em breve!')" style="color: var(--azul-dahj); font-weight: bold; text-decoration: none; margin-top: 15px; display: inline-block;">Ler na íntegra →</a>
-                    `;
-                    feed.appendChild(card);
-                });
-            } catch (error) {
-                console.error("Erro:", error);
-                feed.innerHTML = '<p style="padding:20px;">Erro ao carregar o feed. Verifique a URL do Apps Script.</p>';
-            }
-        }
-
-        function filterSelection(c, event) {
-            let x = document.getElementsByClassName("filter-item");
-            if (c == "all") c = "";
+    async function carregarMaterias() {
+        const feed = document.getElementById('feed');
+        
+        try {
+            // O "?t=" ajuda a evitar o cache chato do navegador
+            const response = await fetch(URL_API + "?t=" + Date.now());
             
-            for (let i = 0; i < x.length; i++) {
-                x[i].style.display = "none";
-                if (x[i].className.indexOf(c) > -1) x[i].style.display = "flex";
+            if (!response.ok) throw new Error('Não foi possível conectar ao servidor.');
+
+            const materias = await response.json();
+
+            if (!materias || materias.length === 0) {
+                feed.innerHTML = '<article class="card"><p>✅ Conectado ao servidor, mas nenhuma matéria foi encontrada na pasta do Drive.</p></article>';
+                return;
             }
 
-            let btns = document.getElementsByClassName("filter-btn");
-            for (let i = 0; i < btns.length; i++) {
-                btns[i].classList.remove("active");
-            }
-            if(event) event.currentTarget.classList.add("active");
+            feed.innerHTML = ''; // Limpa o "Carregando..."
+
+            materias.forEach(materia => {
+                const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR');
+                const card = document.createElement('article');
+                card.className = 'card';
+
+                // Usamos a biblioteca marked para converter o corpo da notícia (Markdown -> HTML)
+                const conteudoHTML = marked.parse(materia.conteudo || "");
+
+                card.innerHTML = `
+                    <div class="card-meta">
+                        📅 ${dataFormatada} • Por: <strong>${materia.autor}</strong>
+                    </div>
+                    <h2>${materia.titulo}</h2>
+                    <div class="card-body">
+                        ${conteudoHTML}
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            feed.innerHTML = `
+                <article class="card" style="border-left-color: red;">
+                    <h2>⚠️ Erro de Conexão</h2>
+                    <p>Não conseguimos carregar as notícias automaticamente.</p>
+                    <p><small>Detalhes: ${error.message}</small></p>
+                    <a href="${URL_API}" target="_blank" style="color: blue;">Clique aqui para testar o link direto</a>
+                </article>
+            `;
         }
+    }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            carregarMaterias();
+    // Inicia a carga quando a página abre
+    window.onload = carregarMaterias;
+</script>
 
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(() => console.log('PWA DAHJ Ativo'))
-                    .catch(err => console.log('Erro PWA:', err));
-            }
-        });
-    </script>
 </body>
 </html>
