@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O Eco! - PROTÓTIPO</title>
+    
+    <meta name="theme-color" content="#001f4d">
+    <link rel="manifest" href="manifest.json">
+    
     <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
@@ -14,10 +18,9 @@
             --amarelo: #FFD700;
             --bg: #f4f4f4;
             --branco: #ffffff;
-            --ruido: rgba(100, 100, 100, 0.4); /* Cor do carimbo */
+            --ruido: rgba(100, 100, 100, 0.4);
         }
 
-        /* --- O RUÍDO: MARCA D'ÁGUA DE SEGURANÇA --- */
         body::before {
             content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO FICTÍCIO • MODELO PARA APRESENTAÇÃO";
             position: fixed;
@@ -47,17 +50,16 @@
             font-weight: bold;
             text-transform: uppercase;
             z-index: 9998;
-            pointer-events: none; /* Não atrapalha o clique */
+            pointer-events: none;
             letter-spacing: 5px;
             opacity: 0.6;
         }
 
-        /* --- RESTANTE DO LAYOUT --- */
         body { 
             margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
             background: var(--bg); color: #333;
             display: flex; flex-direction: column; min-height: 100vh;
-            padding-top: 18px; /* Espaço para a faixa de aviso no topo */
+            padding-top: 18px;
         }
 
         header {
@@ -195,7 +197,7 @@
             <a href="index.html" class="btn-side">OUVIDORIA</a>
             <a href="guia.html" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
             <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
-                <strong>Aviso de Protótipo:</strong><br>
+                <strong>Aviso de Protótipo:</strong>
                 Este site é um modelo experimental desenvolvido para a chapa A Luta Faz Eco!
             </div>
         </aside>
@@ -210,6 +212,7 @@
     </footer>
 
     <script>
+        // Lógica de Filtro original
         function filterSelection(c) {
             var x, i;
             x = document.getElementsByClassName("filter-item");
@@ -225,6 +228,17 @@
                 btns[i].classList.remove("active");
             }
             if(event) event.currentTarget.classList.add("active");
+        }
+
+        // Lógica de Registro do Service Worker para o PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(reg) {
+                    console.log('PWA: O Eco! registrado com sucesso.');
+                }).catch(function(err) {
+                    console.log('PWA: Erro no registro: ', err);
+                });
+            });
         }
     </script>
 </body>
