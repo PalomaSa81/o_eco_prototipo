@@ -7,35 +7,25 @@
     
     <meta name="theme-color" content="#001f4d">
     <link rel="manifest" href="manifest.json">
-    
     <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
-    <style>
-        @import url('https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec
-');
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
         :root {
             --azul-dahj: #001f4d; 
             --azul-botao: #00265e; 
             --amarelo: #FFD700;
             --bg: #f4f4f4;
             --branco: #ffffff;
-            --ruido: rgba(100, 100, 100, 0.4);
         }
 
         body::before {
             content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO DINÂMICO • DAHJ UFF";
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: #e0e0e0;
-            color: #777;
-            font-size: 10px;
-            text-align: center;
-            letter-spacing: 2px;
-            z-index: 9999;
-            padding: 3px 0;
-            font-weight: bold;
-            border-bottom: 1px solid #ccc;
+            position: fixed; top: 0; width: 100%; background: #e0e0e0;
+            color: #777; font-size: 10px; text-align: center;
+            letter-spacing: 2px; z-index: 9999; padding: 3px 0;
+            font-weight: bold; border-bottom: 1px solid #ccc;
         }
 
         body { 
@@ -88,8 +78,13 @@
         }
 
         .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
-        .card p { margin: 10px 0; line-height: 1.5; color: #555; }
+        .card-meta { font-size: 0.85rem; color: #777; margin-bottom: 10px; }
+        .card-body { line-height: 1.6; color: #444; overflow: hidden; }
         
+        /* Estilização básica para o markdown renderizado */
+        .card-body p { margin-bottom: 10px; }
+        .card-body strong { color: #000; }
+
         .btn-side {
             display: block; background: var(--azul-botao); color: white;
             text-align: center; padding: 15px; text-decoration: none; font-weight: bold;
@@ -119,9 +114,10 @@
     </header>
 
     <nav class="filter-bar">
-        <button class="filter-btn active" onclick="filterSelection('all')">Tudo</button>
-        <button class="filter-btn" onclick="filterSelection('dahj')">DAHJ</button>
-        <button class="filter-btn" onclick="filterSelection('aluno')">Aluno</button>
+        <button class="filter-btn active" onclick="filterSelection('all', event)">Tudo</button>
+        <button class="filter-btn" onclick="filterSelection('dahj', event)">DAHJ</button>
+        <button class="filter-btn" onclick="filterSelection('aluno', event)">Aluno</button>
+        <button class="filter-btn" onclick="filterSelection('prof', event)">Professor</button>
     </nav>
 
     <div class="container">
@@ -134,7 +130,7 @@
             <a href="#" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
             <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
                 <strong>Portal DAHJ:</strong>
-                Este é um ambiente dinâmico integrado ao Google Drive do Diretório.
+                Este é um ambiente dinâmico integrado ao Google Drive.
             </div>
         </aside>
     </div>
@@ -148,10 +144,9 @@
     </footer>
 
     <script>
-        // --- CONFIGURAÇÃO ---
+        // --- COLOQUE SUA URL DO APPS SCRIPT AQUI ---
         const URL_API = "https://script.google.com/macros/s/AKfycbxyu2nQ_cRrLBfggVaf9tGmhx1V7bZ-_uSl-xNCaYZ84itDQTUQeJPWrMQu6tqzqwvR/exec";
 
-        // Função para buscar matérias do Drive
         async function carregarMaterias() {
             const feed = document.getElementById('feed');
             try {
@@ -163,35 +158,45 @@
                     return;
                 }
 
-                feed.innerHTML = ''; // Limpa o "Carregando..."
+                feed.innerHTML = ''; 
 
                 materias.forEach(materia => {
                     const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR');
                     const card = document.createElement('article');
-                    // Define a classe de filtro (padrão 'aluno' para teste)
-                    card.className = 'card filter-item aluno'; 
+                    
+                    // Define a categoria para o filtro
+                    const cat = materia.categoria || 'aluno';
+                    card.className = `card filter-item ${cat}`; 
+
+                    // Renderiza o Markdown para HTML
+                    const resumoMarkdown = materia.conteudo ? materia.conteudo.substring(0, 350) + "..." : "";
+                    const corpoHTML = marked.parse(resumoMarkdown);
+
                     card.innerHTML = `
-                        <small>📅 ${dataFormatada}</small>
+                        <div class="card-meta">📅 ${dataFormatada} • Por: <strong>${materia.autor || 'Redação'}</strong></div>
                         <h2>${materia.titulo}</h2>
-                        <p>${materia.conteudo.substring(0, 250)}...</p>
-                        <a href="#" onclick="alert('Leitura completa em desenvolvimento!')" style="color: var(--azul-dahj); font-weight: bold; text-decoration: none;">Ler na íntegra →</a>
+                        <div class="card-body">
+                            ${corpoHTML}
+                        </div>
+                        <a href="#" onclick="alert('Página completa em breve!')" style="color: var(--azul-dahj); font-weight: bold; text-decoration: none; margin-top: 15px; display: inline-block;">Ler na íntegra →</a>
                     `;
                     feed.appendChild(card);
                 });
             } catch (error) {
                 console.error("Erro:", error);
-                feed.innerHTML = '<p style="padding:20px;">Erro ao conectar com o servidor do DAHJ.</p>';
+                feed.innerHTML = '<p style="padding:20px;">Erro ao carregar o feed. Verifique a URL do Apps Script.</p>';
             }
         }
 
-        // Lógica de Filtro
-        function filterSelection(c) {
+        function filterSelection(c, event) {
             let x = document.getElementsByClassName("filter-item");
             if (c == "all") c = "";
+            
             for (let i = 0; i < x.length; i++) {
                 x[i].style.display = "none";
                 if (x[i].className.indexOf(c) > -1) x[i].style.display = "flex";
             }
+
             let btns = document.getElementsByClassName("filter-btn");
             for (let i = 0; i < btns.length; i++) {
                 btns[i].classList.remove("active");
@@ -199,7 +204,6 @@
             if(event) event.currentTarget.classList.add("active");
         }
 
-        // Inicialização
         window.addEventListener('DOMContentLoaded', () => {
             carregarMaterias();
 
