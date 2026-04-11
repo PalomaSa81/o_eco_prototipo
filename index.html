@@ -3,155 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Eco! - Protótipo</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>O Eco! - Jornal do DAHJ</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#003366">
+    <link rel="apple-touch-icon" href="logo-dahj.jpg">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* --- SEU CSS ORIGINAL DO DAHJ --- */
+        /* CSS Inspirado na Ouvidoria DAHJ */
         :root {
-            --azul-dahj: #003366;
-            --azul-claro: #e6f0ff;
-            --branco: #ffffff;
-            --cinza: #f4f4f4;
-            --texto: #333;
+            --primary: #003366;
+            --secondary: #00509e;
+            --accent: #ffcc00;
+            --bg: #f0f2f5;
+            --white: #ffffff;
+            --text: #1c1e21;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: var(--cinza);
-            color: var(--texto);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
         }
 
+        /* Header Estilo Ouvidoria com Imagem de Fundo */
         header {
-            background-color: var(--azul-dahj);
-            color: var(--branco);
-            padding: 1rem;
+            background: linear-gradient(rgba(0, 51, 102, 0.85), rgba(0, 51, 102, 0.85)), 
+                        url('capa-chapa.jpg') center/cover no-repeat;
+            color: var(--white);
+            padding: 60px 20px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header img {
+            width: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid var(--white);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 20px;
+            max-width: 700px;
+            margin: -30px auto 40px;
+            padding: 0 15px;
         }
 
-        /* Estilo dos Cards de Notícia */
-        article.card {
-            background: var(--branco);
-            margin-bottom: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 5px solid var(--azul-dahj);
+        /* Cards de Notícia */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
         }
 
         .card-meta {
-            font-size: 0.85rem;
-            color: #666;
+            font-size: 0.8rem;
+            color: #65676b;
+            text-transform: uppercase;
+            font-weight: bold;
             margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
         }
 
         .card h2 {
             margin: 0 0 15px 0;
-            color: var(--azul-dahj);
+            color: var(--primary);
+            font-size: 1.6rem;
         }
 
         .card-body {
-            line-height: 1.6;
+            font-size: 1.05rem;
+            color: #444;
+        }
+
+        /* Ajuste de Markdown e Quebras de Linha */
+        .card-body p { margin-bottom: 15px; }
+        
+        .loading-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--primary);
+            font-weight: bold;
         }
 
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
+            color: #888;
             font-size: 0.9rem;
-            color: #666;
-            background: #ddd;
-            margin-top: 40px;
         }
 
-        #loading {
-            text-align: center;
-            padding: 40px;
-            font-style: italic;
+        /* Botão Flutuante de Atualizar (Opcional) */
+        .btn-refresh {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>📰 O Eco!</h1>
-    <p>Informativo do Diretório Acadêmico Hermann Júnior (UFF)</p>
+    <img src="logo-dahj.jpg" alt="Logo DAHJ">
+    <h1>O Eco!</h1>
+    <p>Informativo Digital • Economia UFF</p>
 </header>
 
 <div class="container" id="feed">
-    <div id="loading">Carregando as últimas notícias...</div>
+    <div class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i> Buscando edições recentes...
+    </div>
 </div>
 
+<button class="btn-refresh" onclick="carregarMaterias()" title="Atualizar">
+    <i class="fas fa-sync-alt"></i>
+</button>
+
 <footer>
-    &copy; 2026 DAHJ - Desenvolvido por Paloma de Sá
+    <p>Diretório Acadêmico Hermann Júnior</p>
+    <p><small>Desenvolvido com ❤️ por Paloma de Sá</small></p>
 </footer>
 
 <script>
-    // --- COLE SUA URL DO APPS SCRIPT AQUI ---
-    const URL_API = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
+    // --- CONFIGURAÇÃO ---
+    const URL_API = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec"; 
 
+    // 1. Registro do Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW ativo!'))
+                .catch(err => console.error('Erro SW:', err));
+        });
+    }
+
+    // 2. Função de Carregamento via API
     async function carregarMaterias() {
         const feed = document.getElementById('feed');
         
         try {
-            // O "?t=" ajuda a evitar o cache chato do navegador
-            const response = await fetch(URL_API + "?t=" + Date.now());
-            
-            if (!response.ok) throw new Error('Não foi possível conectar ao servidor.');
-
+            const response = await fetch(URL_API + "?nocache=" + Date.now());
+            if (!response.ok) throw new Error();
             const materias = await response.json();
 
             if (!materias || materias.length === 0) {
-                feed.innerHTML = '<article class="card"><p>✅ Conectado ao servidor, mas nenhuma matéria foi encontrada na pasta do Drive.</p></article>';
+                feed.innerHTML = '<div class="card">Nenhuma matéria publicada ainda.</div>';
                 return;
             }
 
-            feed.innerHTML = ''; // Limpa o "Carregando..."
+            feed.innerHTML = ''; // Limpa o loading
 
             materias.forEach(materia => {
-                const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR');
+                const dataStr = new Date(materia.data).toLocaleDateString('pt-BR');
                 const card = document.createElement('article');
                 card.className = 'card';
-
-                // Usamos a biblioteca marked para converter o corpo da notícia (Markdown -> HTML)
-                const conteudoHTML = marked.parse(materia.conteudo || "");
+                
+                // Converte Markdown para HTML
+                const htmlCorpo = marked.parse(materia.conteudo || "");
 
                 card.innerHTML = `
                     <div class="card-meta">
-                        📅 ${dataFormatada} • Por: <strong>${materia.autor}</strong>
+                        <span><i class="far fa-calendar-alt"></i> ${dataStr}</span>
+                        <span><i class="far fa-user"></i> ${materia.autor}</span>
                     </div>
                     <h2>${materia.titulo}</h2>
-                    <div class="card-body">
-                        ${conteudoHTML}
-                    </div>
+                    <div class="card-body">${htmlCorpo}</div>
                 `;
                 feed.appendChild(card);
             });
 
         } catch (error) {
-            console.error("Erro detalhado:", error);
             feed.innerHTML = `
-                <article class="card" style="border-left-color: red;">
-                    <h2>⚠️ Erro de Conexão</h2>
-                    <p>Não conseguimos carregar as notícias automaticamente.</p>
-                    <p><small>Detalhes: ${error.message}</small></p>
-                    <a href="${URL_API}" target="_blank" style="color: blue;">Clique aqui para testar o link direto</a>
-                </article>
-            `;
+                <div class="card" style="text-align:center;">
+                    <i class="fas fa-exclamation-triangle" style="color:#d93025; font-size:2rem;"></i>
+                    <p>Houve um erro ao sincronizar com o Google Drive.</p>
+                    <button onclick="location.reload()" style="padding:10px 20px; border-radius:5px; border:none; background:var(--primary); color:white;">Tentar Novamente</button>
+                </div>`;
         }
     }
 
-    // Inicia a carga quando a página abre
+    // Inicializa
     window.onload = carregarMaterias;
 </script>
 
