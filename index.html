@@ -7,6 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
     <link rel="apple-touch-icon" href="logo-dahj.jpg">
+    <meta name="theme-color" content="#001f4d">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -39,7 +40,6 @@
             pointer-events: none; letter-spacing: 5px; opacity: 0.6;
         }
 
-        /* --- LAYOUT ORIGINAL --- */
         body { 
             margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
             background: var(--bg); color: #333;
@@ -54,8 +54,8 @@
             border-bottom: 5px solid var(--amarelo);
         }
 
-        .logo-dahj { width: 100px; } /* Removido o arredondamento e borda */
-        
+        .logo-dahj { width: 100px; } 
+
         header h1 { 
             color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0;
@@ -82,12 +82,13 @@
         .card { 
             background: var(--branco); padding: 25px; border-radius: 4px; margin-bottom: 15px;
             border-left: 5px solid var(--azul-dahj); display: flex; flex-direction: column;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
-        .card p, .card div { margin: 10px 0; line-height: 1.5; color: #555; }
+        .card-body { margin-top: 10px; line-height: 1.6; color: #444; }
         
-        /* Bordas laterais por categoria */
+        /* Cores de Entidade */
         .entidade-aluno { border-left-color: #00b894; }
         .entidade-prof { border-left-color: #6c5ce7; }
         .entidade-conv { border-left-color: #e17055; }
@@ -107,7 +108,7 @@
         .footer-text { font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold; }
         .copyright { font-size: 0.7rem; color: #999; margin-top: 20px; }
 
-        #debug-token { font-size: 8px; color: #ccc; word-break: break-all; margin-top: 10px; }
+        #debug-token-area { font-size: 9px; color: #bbb; word-break: break-all; margin-top: 20px; padding: 10px; border-top: 1px solid #eee; }
 
         @media (max-width: 850px) {
             .container { grid-template-columns: 1fr; }
@@ -133,17 +134,17 @@
 
     <div class="container">
         <main id="feed">
-            <div style="text-align:center; padding:50px;">Sincronizando...</div>
+            <div style="text-align:center; padding:50px;"><i class="fas fa-sync fa-spin"></i> Conectando ao Drive...</div>
         </main>
 
         <aside>
             <a href="https://dahj-uff.github.io/ouvidoria/" class="btn-side">OUVIDORIA</a>
             <a href="#" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
             <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
-                <strong>Aviso de Protótipo:</strong><br>
-                Este site é um modelo experimental desenvolvido para a chapa A Luta Faz Eco!
+                <strong>Informativo:</strong><br>
+                Protótipo experimental para a chapa "A Luta Faz Eco!".
             </div>
-            <div id="debug-token"></div>
+            <div id="debug-token-area">Aguardando Token...</div>
         </aside>
     </div>
 
@@ -173,11 +174,13 @@
         firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
+        // Recebimento em primeiro plano (silencioso)
         messaging.onMessage((payload) => {
-            console.log('Mensagem recebida, atualizando...');
+            console.log('Nova matéria detectada. Atualizando feed...');
             carregarMaterias('all');
         });
 
+        // Service Worker e Token
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then((registration) => {
@@ -185,7 +188,12 @@
                         serviceWorkerRegistration: registration,
                         vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                     }).then((token) => {
-                        if (token) console.log("Token Ativo");
+                        if (token) {
+                            document.getElementById('debug-token-area').innerText = "Token: " + token;
+                            console.log("Token:", token);
+                        }
+                    }).catch((err) => {
+                        document.getElementById('debug-token-area').innerText = "Erro ao gerar Token.";
                     });
                 });
             });
@@ -194,7 +202,7 @@
         async function carregarMaterias(filtro = 'all') {
             const feed = document.getElementById('feed');
             
-            // Estética dos botões de filtro
+            // UI dos Botões
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if(btn.getAttribute('onclick').includes(`'${filtro}'`)) btn.classList.add('active');
@@ -207,23 +215,28 @@
 
                 const filtradas = filtro === 'all' ? materias : materias.filter(m => m.categoria === filtro);
 
+                if (filtradas.length === 0) {
+                    feed.innerHTML = '<div class="card">Nenhuma matéria encontrada.</div>';
+                    return;
+                }
+
                 filtradas.forEach(materia => {
                     const card = document.createElement('article');
-                    // Mapeia categoria para a classe CSS correta
                     const catClass = `entidade-${materia.categoria || 'dahj'}`;
                     card.className = `card ${catClass}`;
                     
-                    const data = new Date(materia.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}).toUpperCase();
+                    const dataObj = materia.data ? new Date(materia.data) : new Date();
+                    const dataStr = dataObj.toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}).toUpperCase();
                     
                     card.innerHTML = `
-                        <small>${(materia.categoria || 'DAHJ').toUpperCase()} • ${data}</small>
+                        <small>${(materia.categoria || 'DAHJ').toUpperCase()} • ${dataStr}</small>
                         <h2>${materia.titulo}</h2>
-                        <div>${marked.parse(materia.conteudo || "")}</div>
+                        <div class="card-body">${marked.parse(materia.conteudo || "")}</div>
                     `;
                     feed.appendChild(card);
                 });
             } catch (e) {
-                feed.innerHTML = '<div class="card">Erro ao carregar matérias.</div>';
+                feed.innerHTML = '<div class="card">Erro ao carregar o feed. Verifique sua conexão.</div>';
             }
         }
         window.onload = () => carregarMaterias('all');
