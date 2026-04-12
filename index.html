@@ -54,7 +54,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 
 <script>
-    // 1. SUA CONFIGURAÇÃO QUE VOCÊ ACABOU DE GERAR
     const firebaseConfig = {
         apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
         authDomain: "dahj-hub.firebaseapp.com",
@@ -64,7 +63,6 @@
         appId: "1:964532263352:web:fe3d32318ed86be611d74d"
     };
 
-    // 2. URL DO SEU APPS SCRIPT (SUBSTITUA AQUI)
     const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
     firebase.initializeApp(firebaseConfig);
@@ -77,8 +75,15 @@
                     serviceWorkerRegistration: registration,
                     vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                 }).then((token) => {
-                    if (token) console.log("Token ativo!");
-                }).catch((err) => console.log("Aguardando permissão de notificação..."));
+                    if (token) {
+                        console.log("Token gerado:", token);
+                        // Sintoniza o celular no tópico 'jornal'
+                        fetch(`https://iid.googleapis.com/iid/v1/${token}/rel/topics/jornal`, {
+                            method: 'POST',
+                            headers: { 'Authorization': 'key=' + firebaseConfig.apiKey }
+                        }).then(() => console.log("Sintonizado no tópico jornal!"));
+                    }
+                }).catch((err) => console.log("Erro ao obter token:", err));
             });
         });
     }
