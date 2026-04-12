@@ -10,45 +10,36 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// GESTOR DE NOTIFICAÇÕES EM SEGUNDO PLANO
+// GESTOR DE SEGUNDO PLANO
 messaging.onBackgroundMessage((payload) => {
-    console.log("Recebido em segundo plano:", payload);
-
-    // Se o payload já possui um objeto 'notification', o Firebase SDK 
-    // vai exibir a notificação automaticamente. 
-    // Não precisamos (e não devemos) chamar showNotification() aqui,
-    // a menos que queiramos customizar algo que o Firebase não enviou.
+    console.log("Recebido:", payload);
     
+    // Se o payload já tem notification, o Firebase vai tentar exibir.
+    // Para evitar que o 'App' e o 'Chrome' exibam juntos, a TAG é vital.
     if (payload.notification) {
-        console.log("Firebase cuidará da exibição. Evitando duplicidade.");
         return; 
     }
-
-    // Caso o payload venha APENAS com 'data' (sem notification), 
-    // aí sim criamos uma manualmente:
-    const notificationTitle = "📰 O Eco!";
-    const notificationOptions = {
-        body: payload.data.body || "Nova matéria disponível!",
-        icon: 'logo-dahj.jpg',
-        badge: 'logo-dahj.jpg',
-        tag: 'o-eco-notifica', // Tag de segurança
-        data: {
-            url: 'https://palomasa81.github.io/o_eco_prototipo/'
-        }
-    };
-
-    return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
+// O SEGREDO ESTÁ AQUI: Gerenciar o clique e as janelas
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    
-    // Pega a URL dos dados ou usa a padrão do site
-    const urlParaAbrir = (event.notification.data && event.notification.data.url) 
-                         ? event.notification.data.url 
-                         : 'https://palomasa81.github.io/o_eco_prototipo/';
+
+    const urlParaAbrir = 'https://palomasa81.github.io/o_eco_prototipo/';
 
     event.waitUntil(
-        clients.openWindow(urlParaAbrir)
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then((windowClients) => {
+                // 1. Verifica se o site/app já está aberto
+                for (let client of windowClients) {
+                    if (client.url === urlParaAbrir && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                // 2. Se não estiver aberto, abre uma nova janela (ou o app)
+                if (clients.openWindow) {
+                    return clients.openWindow(urlParaAbrir);
+                }
+            })
     );
 });
