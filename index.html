@@ -35,7 +35,7 @@
 
         // 2. URL DO SEU DEPLOY (WEB APP) DO APPS SCRIPT
         // IMPORTANTE: Substitua pelo link que obteve no "Nova Implantação"
-        const URL_APPS_SCRIPT = "https://script.google.com/macros/s/SEU_ID_DO_DEPLOY_AQUI/exec";
+        const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
         // 3. FUNÇÃO PARA ENVIAR O TOKEN PARA A PLANILHA
         function registrarTokenNoServidor(token) {
@@ -54,7 +54,7 @@
         // 4. SOLICITAR PERMISSÃO E GERAR TOKEN
         function inicializarNotificacoes() {
             messaging.getToken({ 
-                vapidKey: 'SUA_CHAVE_VAPID_DO_FIREBASE' // Pegue na aba Cloud Messaging do Firebase
+                vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' // Pegue na aba Cloud Messaging do Firebase
             })
             .then((currentToken) => {
                 if (currentToken) {
