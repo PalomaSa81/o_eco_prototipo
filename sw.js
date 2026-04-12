@@ -10,50 +10,38 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-// 1. Forçar atualização imediata
+// Força o SW a atualizar na hora
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', () => clients.claim());
 
-// 2. O SEGREDO: Ouvinte nativo de Push (Mais rápido que o do Firebase)
+// O QUE RESOLVE O SININHO: Ouvinte de Push nativo
 self.addEventListener('push', function(event) {
-  console.log('[sw.js] Push recebido!');
-  
   let data = {};
   if (event.data) {
     try {
-      // O FCM V1 entrega os dados dentro de um objeto 'data'
-      const payload = event.data.json();
-      data = payload.data || payload; 
+      // No FCM V1, o JSON vem com um objeto 'data' dentro
+      const msg = event.data.json();
+      data = msg.data || msg; 
     } catch (e) {
-      console.error("Erro ao ler JSON do push", e);
+      console.error("Erro ao ler JSON", e);
     }
   }
 
   const title = data.title || "Novo no O Eco!";
   const options = {
-    body: data.body || "Confira as novidades no portal.",
+    body: data.body || "Confira a nova matéria publicada.",
     icon: 'logo-dahj.jpg',
     badge: 'logo-dahj.jpg',
     tag: 'dahj-notificacao-unica',
-    renotify: true, // Faz o celular vibrar de novo se chegar outra
-    data: {
-      url: 'https://dahj-uff.github.io/o-eco/'
-    }
+    data: { url: 'https://dahj-uff.github.io/o-eco/' }
   };
 
-  // Aqui dizemos para o navegador: "Não mostre o sininho genérico, use a MINHA notificação"
+  // OBRIGATÓRIO: event.waitUntil garante que a notificação apareça 
+  // antes do Android desistir e mostrar o sininho genérico
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// 3. Ação de clique
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      for (let client of windowClients) {
-        if (client.url === event.notification.data.url && 'focus' in client) return client.focus();
-      }
-      if (clients.openWindow) return clients.openWindow(event.notification.data.url);
-    })
-  );
+  event.waitUntil(clients.openWindow(event.notification.data.url));
 });
