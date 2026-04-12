@@ -1,7 +1,6 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// Essas infos têm que ser IDÊNTICAS às do seu index.html
 const firebaseConfig = {
   apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
   projectId: "dahj-hub",
@@ -12,13 +11,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Isso aqui é o que faz a mágica da notificação aparecer com o Chrome fechado
 messaging.onBackgroundMessage((payload) => {
   console.log('[sw.js] Recebida mensagem em background: ', payload);
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'logo-dahj.jpg', // Certifique-se que esse arquivo existe na raiz
+    icon: 'logo-dahj.jpg', 
     badge: 'logo-dahj.jpg'
   };
 
