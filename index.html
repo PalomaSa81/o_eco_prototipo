@@ -13,207 +13,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* CSS Inspirado na Ouvidoria DAHJ */
-        :root {
-            --primary: #003366;
-            --secondary: #00509e;
-            --accent: #ffcc00;
-            --bg: #f0f2f5;
-            --white: #ffffff;
-            --text: #1c1e21;
+        :root { --primary: #003366; --bg: #f0f2f5; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: var(--bg); }
+        header { 
+            background: linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.85)), url('capa-chapa.jpg') center/cover;
+            color: white; padding: 50px 20px; text-align: center; 
         }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+        header img { width: 70px; border-radius: 50%; border: 2px solid white; margin-bottom: 10px; }
+        .container { max-width: 700px; margin: -30px auto 50px; padding: 0 15px; }
+        .card { 
+            background: var(--white); border-radius: 12px; padding: 25px; margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 6px solid var(--primary);
         }
-
-        /* Header Estilo Ouvidoria com Imagem de Fundo */
-        header {
-            background: linear-gradient(rgba(0, 51, 102, 0.85), rgba(0, 51, 102, 0.85)), 
-                        url('capa-chapa.jpg') center/cover no-repeat;
-            color: var(--white);
-            padding: 60px 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        header img {
-            width: 80px;
-            border-radius: 50%;
-            margin-bottom: 15px;
-            border: 3px solid var(--white);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: -30px auto 40px;
-            padding: 0 15px;
-        }
-
-        /* Cards de Notícia */
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-            border: none;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-meta {
-            font-size: 0.8rem;
-            color: #65676b;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .card h2 {
-            margin: 0 0 15px 0;
-            color: var(--primary);
-            font-size: 1.6rem;
-        }
-
-        .card-body {
-            font-size: 1.05rem;
-            color: #444;
-        }
-
-        /* Ajuste de Markdown e Quebras de Linha */
-        .card-body p { margin-bottom: 15px; }
-        
-        .loading-state {
-            text-align: center;
-            padding: 50px;
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        /* Botão Flutuante de Atualizar (Opcional) */
-        .btn-refresh {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .card h2 { margin: 0 0 10px; color: var(--primary); font-size: 1.6rem; }
+        .card-meta { font-size: 0.85rem; color: #666; margin-bottom: 15px; display: flex; gap: 15px; }
+        .card-body { line-height: 1.6; color: #333; }
+        footer { text-align: center; padding: 30px; color: #888; font-size: 0.9rem; }
+        .btn-refresh { 
+            position: fixed; bottom: 20px; right: 20px; background: var(--primary); 
+            color: white; border: none; width: 55px; height: 55px; border-radius: 50%; 
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="logo-dahj.jpg" alt="Logo DAHJ">
+    <img src="logo-dahj.jpg" alt="DAHJ">
     <h1>O Eco!</h1>
-    <p>Informativo Digital • Economia UFF</p>
+    <p>Informativo Digital da Economia UFF</p>
 </header>
 
 <div class="container" id="feed">
-    <div class="loading-state">
-        <i class="fas fa-spinner fa-spin"></i> Buscando edições recentes...
-    </div>
+    <div style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando...</div>
 </div>
 
-<button class="btn-refresh" onclick="carregarMaterias()" title="Atualizar">
-    <i class="fas fa-sync-alt"></i>
-</button>
+<button class="btn-refresh" onclick="carregarMaterias()"><i class="fas fa-sync-alt fa-lg"></i></button>
 
-<footer>
-    <p>Diretório Acadêmico Hermann Júnior</p>
-    <p><small>Desenvolvido com ❤️ por Paloma de Sá</small></p>
-</footer>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 
 <script>
-    // --- CONFIGURAÇÃO ---
-    const URL_API = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec"; 
+    // 1. SUA CONFIGURAÇÃO QUE VOCÊ ACABOU DE GERAR
+    const firebaseConfig = {
+        apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
+        authDomain: "dahj-hub.firebaseapp.com",
+        projectId: "dahj-hub",
+        storageBucket: "dahj-hub.firebasestorage.app",
+        messagingSenderId: "964532263352",
+        appId: "1:964532263352:web:fe3d32318ed86be611d74d"
+    };
 
-    // 1. Registro do Service Worker (PWA)
+    // 2. URL DO SEU APPS SCRIPT (SUBSTITUA AQUI)
+    const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
+
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW ativo!'))
-                .catch(err => console.error('Erro SW:', err));
+            navigator.serviceWorker.register('sw.js').then((registration) => {
+                messaging.getToken({ 
+                    serviceWorkerRegistration: registration,
+                    vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
+                }).then((token) => {
+                    if (token) console.log("Token ativo!");
+                }).catch((err) => console.log("Aguardando permissão de notificação..."));
+            });
         });
     }
 
-    // 2. Função de Carregamento via API
     async function carregarMaterias() {
         const feed = document.getElementById('feed');
-        
         try {
-            const response = await fetch(URL_API + "?nocache=" + Date.now());
-            if (!response.ok) throw new Error();
+            const response = await fetch(URL_API_DRIVE + "?t=" + Date.now());
             const materias = await response.json();
-
-            if (!materias || materias.length === 0) {
-                feed.innerHTML = '<div class="card">Nenhuma matéria publicada ainda.</div>';
-                return;
-            }
-
-            feed.innerHTML = ''; // Limpa o loading
-
+            feed.innerHTML = '';
             materias.forEach(materia => {
-                const dataStr = new Date(materia.data).toLocaleDateString('pt-BR');
                 const card = document.createElement('article');
                 card.className = 'card';
-                
-                // Converte Markdown para HTML
-                const htmlCorpo = marked.parse(materia.conteudo || "");
-
                 card.innerHTML = `
                     <div class="card-meta">
-                        <span><i class="far fa-calendar-alt"></i> ${dataStr}</span>
+                        <span><i class="far fa-calendar-alt"></i> ${new Date(materia.data).toLocaleDateString()}</span>
                         <span><i class="far fa-user"></i> ${materia.autor}</span>
                     </div>
                     <h2>${materia.titulo}</h2>
-                    <div class="card-body">${htmlCorpo}</div>
+                    <div class="card-body">${marked.parse(materia.conteudo || "")}</div>
                 `;
                 feed.appendChild(card);
             });
-
-        } catch (error) {
-            feed.innerHTML = `
-                <div class="card" style="text-align:center;">
-                    <i class="fas fa-exclamation-triangle" style="color:#d93025; font-size:2rem;"></i>
-                    <p>Houve um erro ao sincronizar com o Google Drive.</p>
-                    <button onclick="location.reload()" style="padding:10px 20px; border-radius:5px; border:none; background:var(--primary); color:white;">Tentar Novamente</button>
-                </div>`;
+        } catch (e) {
+            feed.innerHTML = '<div class="card">Erro ao carregar matérias.</div>';
         }
     }
-
-    // Inicializa
     window.onload = carregarMaterias;
 </script>
-
 </body>
 </html>
