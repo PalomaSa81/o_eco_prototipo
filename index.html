@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O Eco! - Jornal do DAHJ</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#003366">
     <link rel="apple-touch-icon" href="logo-dahj.jpg">
-    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <style>
         :root { --primary: #003366; --bg: #f0f2f5; --white: #ffffff; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: var(--bg); }
@@ -33,17 +30,7 @@
             color: white; border: none; width: 55px; height: 55px; border-radius: 50%; 
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
-        /* Estilo para a área de Debug do Token */
-        #debug-token {
-            font-size: 10px;
-            word-break: break-all;
-            padding: 20px;
-            color: #666;
-            background: #eee;
-            margin: 20px;
-            border-radius: 8px;
-            border: 1px dashed #ccc;
-        }
+        #debug-token { font-size: 10px; word-break: break-all; padding: 20px; color: #666; background: #eee; margin: 20px; border-radius: 8px; border: 1px dashed #ccc; }
     </style>
 </head>
 <body>
@@ -66,7 +53,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 
 <script>
-    // 1. Sua Configuração
     const firebaseConfig = {
         apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
         authDomain: "dahj-hub.firebaseapp.com",
@@ -76,11 +62,17 @@
         appId: "1:964532263352:web:fe3d32318ed86be611d74d"
     };
 
-    // 2. Coloque o ID do seu Apps Script aqui
     const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
     firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
+
+    // SILENCIADOR DE PRIMEIRO PLANO
+    messaging.onMessage((payload) => {
+        console.log('Site aberto: Silenciando notificação visual para evitar duplicata.');
+        // Opcional: recarregar as matérias automaticamente quando chegar notícia
+        carregarMaterias();
+    });
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -90,11 +82,8 @@
                     vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                 }).then((token) => {
                     if (token) {
-                        console.log("Token:", token);
-                        document.getElementById('debug-token').innerHTML = "<strong>Seu Token (copie para o Apps Script):</strong><br>" + token;
+                        document.getElementById('debug-token').innerHTML = "<strong>Token Atualizado:</strong><br>" + token;
                     }
-                }).catch((err) => {
-                    document.getElementById('debug-token').innerText = "Erro ao obter token: " + err;
                 });
             });
         });
