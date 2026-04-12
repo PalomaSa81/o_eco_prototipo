@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Eco! - JORNAL DO DAHJ</title>
+    <title>O Eco! - PROTÓTIPO</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
     <link rel="apple-touch-icon" href="logo-dahj.jpg">
-    <meta name="theme-color" content="#001f4d">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
 
@@ -24,7 +23,7 @@
             --ruido: rgba(100, 100, 100, 0.4);
         }
 
-        /* --- MARCA D'ÁGUA --- */
+        /* --- MARCA D'ÁGUA DE SEGURANÇA --- */
         body::before {
             content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO FICTÍCIO • MODELO PARA APRESENTAÇÃO";
             position: fixed; top: 0; width: 100%; background: #e0e0e0;
@@ -34,27 +33,33 @@
 
         .carimbo-exemplo {
             position: fixed; bottom: 80px; right: -30px; transform: rotate(-45deg);
-            border: 4px double var(--ruido); color: var(--ruido);
-            padding: 10px 50px; font-size: 2rem; font-weight: bold;
-            text-transform: uppercase; z-index: 9998; pointer-events: none; opacity: 0.6;
+            background: none; border: 4px double var(--ruido);
+            color: var(--ruido); padding: 10px 50px; font-size: 2rem;
+            font-weight: bold; text-transform: uppercase; z-index: 9998;
+            pointer-events: none; letter-spacing: 5px; opacity: 0.6;
         }
 
+        /* --- LAYOUT ORIGINAL --- */
         body { 
             margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
-            background: var(--bg); color: #333; display: flex; flex-direction: column; min-height: 100vh;
+            background: var(--bg); color: #333;
+            display: flex; flex-direction: column; min-height: 100vh;
             padding-top: 18px; 
         }
 
         header {
             width: 100%; padding: 60px 0; text-align: center;
-            background: linear-gradient(rgba(0,31,77,0.7), rgba(0,31,77,0.7)), url('bk0.png') no-repeat center center; 
-            background-size: cover; border-bottom: 5px solid var(--amarelo);
+            background: url('bk0.png') no-repeat center center; 
+            background-size: cover;
+            border-bottom: 5px solid var(--amarelo);
         }
 
-        .logo-dahj { width: 100px; border-radius: 50%; border: 2px solid var(--amarelo); }
+        .logo-dahj { width: 100px; } /* Removido o arredondamento e borda */
+        
         header h1 { 
             color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0; letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0;
+            letter-spacing: 2px;
         }
 
         .filter-bar {
@@ -66,7 +71,8 @@
         .filter-btn {
             background: var(--azul-botao); border: none; color: var(--branco);
             padding: 8px 20px; border-radius: 4px; cursor: pointer; 
-            font-size: 0.8rem; font-weight: bold; text-transform: uppercase; transition: 0.3s ease;
+            font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+            transition: 0.3s ease;
         }
 
         .filter-btn:hover, .filter-btn.active { background: var(--amarelo); color: var(--azul-dahj); }
@@ -74,19 +80,18 @@
         .container { max-width: 1100px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
         
         .card { 
-            background: var(--white); background-color: white; padding: 25px; border-radius: 4px; margin-bottom: 15px;
+            background: var(--branco); padding: 25px; border-radius: 4px; margin-bottom: 15px;
             border-left: 5px solid var(--azul-dahj); display: flex; flex-direction: column;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
-        .card-meta { font-size: 0.75rem; color: #777; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .card p, .card div { margin: 10px 0; line-height: 1.5; color: #555; }
         
-        /* Cores por Categoria */
-        .cat-aluno { border-left-color: #00b894; }
-        .cat-prof { border-left-color: #6c5ce7; }
-        .cat-conv { border-left-color: #e17055; }
-        .cat-dahj { border-left-color: var(--azul-dahj); }
+        /* Bordas laterais por categoria */
+        .entidade-aluno { border-left-color: #00b894; }
+        .entidade-prof { border-left-color: #6c5ce7; }
+        .entidade-conv { border-left-color: #e17055; }
+        .entidade-dahj { border-left-color: var(--azul-dahj); }
 
         .btn-side {
             display: block; background: var(--azul-botao); color: white;
@@ -95,10 +100,14 @@
         }
         .btn-side:hover { background: var(--amarelo); color: var(--azul-dahj); }
 
-        #debug-token { font-size: 9px; word-break: break-all; padding: 10px; color: #999; text-align: center; }
-
-        footer { margin-top: auto; padding: 50px 0 20px 0; text-align: center; width: 100%; background-color: var(--branco); }
+        footer {
+            margin-top: auto; padding: 50px 0 20px 0; text-align: center; width: 100%; background-color: var(--branco);
+        }
         .img-chapa-footer { width: 100px; }
+        .footer-text { font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold; }
+        .copyright { font-size: 0.7rem; color: #999; margin-top: 20px; }
+
+        #debug-token { font-size: 8px; color: #ccc; word-break: break-all; margin-top: 10px; }
 
         @media (max-width: 850px) {
             .container { grid-template-columns: 1fr; }
@@ -124,7 +133,7 @@
 
     <div class="container">
         <main id="feed">
-            <div style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando com o Bloco F...</div>
+            <div style="text-align:center; padding:50px;">Sincronizando...</div>
         </main>
 
         <aside>
@@ -132,16 +141,18 @@
             <a href="#" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
             <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
                 <strong>Aviso de Protótipo:</strong><br>
-                Sistema de notificações ativado via Firebase Cloud Messaging.
+                Este site é um modelo experimental desenvolvido para a chapa A Luta Faz Eco!
             </div>
-            <div id="debug-token">Carregando identificador...</div>
+            <div id="debug-token"></div>
         </aside>
     </div>
 
     <footer>
-        <img src="capa-chapa.jpg" alt="Chapa A Luta Faz Eco" class="img-chapa-footer">
-        <div style="font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold;">Chapa A Luta Faz Eco 2025-2026</div>
-        <div style="font-size: 0.7rem; color: #999;">© A Luta Faz Eco 2026 | Economia UFF</div>
+        <a href="https://www.instagram.com/dahjecouff/" target="_blank">
+            <img src="capa-chapa.jpg" alt="Chapa A Luta Faz Eco" class="img-chapa-footer">
+        </a>
+        <div class="footer-text">Chapa A Luta Faz Eco 2025-2026</div>
+        <div class="copyright">© A Luta Faz Eco 2026 | Economia UFF</div>
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
@@ -162,13 +173,11 @@
         firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
-        // Evita duplicidade em primeiro plano
         messaging.onMessage((payload) => {
-            console.log('Notificação recebida com site aberto. Atualizando feed...');
+            console.log('Mensagem recebida, atualizando...');
             carregarMaterias('all');
         });
 
-        // Registro do Service Worker e Token
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then((registration) => {
@@ -176,10 +185,7 @@
                         serviceWorkerRegistration: registration,
                         vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                     }).then((token) => {
-                        if (token) {
-                            document.getElementById('debug-token').innerText = "ID de Push Ativo";
-                            console.log("Token:", token);
-                        }
+                        if (token) console.log("Token Ativo");
                     });
                 });
             });
@@ -188,12 +194,10 @@
         async function carregarMaterias(filtro = 'all') {
             const feed = document.getElementById('feed');
             
-            // Atualiza botões
+            // Estética dos botões de filtro
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
-                if(btn.innerText.toLowerCase() === filtro.toLowerCase() || (filtro === 'all' && btn.innerText === 'Tudo')) {
-                    btn.classList.add('active');
-                }
+                if(btn.getAttribute('onclick').includes(`'${filtro}'`)) btn.classList.add('active');
             });
 
             try {
@@ -201,29 +205,27 @@
                 const materias = await response.json();
                 feed.innerHTML = '';
 
-                const materiasFiltradas = filtro === 'all' ? materias : materias.filter(m => m.categoria === filtro);
+                const filtradas = filtro === 'all' ? materias : materias.filter(m => m.categoria === filtro);
 
-                if (materiasFiltradas.length === 0) {
-                    feed.innerHTML = '<div class="card">Nenhuma matéria encontrada nesta categoria.</div>';
-                    return;
-                }
-
-                materiasFiltradas.forEach(materia => {
-                    const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                filtradas.forEach(materia => {
                     const card = document.createElement('article');
-                    card.className = `card cat-${materia.categoria || 'dahj'}`;
+                    // Mapeia categoria para a classe CSS correta
+                    const catClass = `entidade-${materia.categoria || 'dahj'}`;
+                    card.className = `card ${catClass}`;
+                    
+                    const data = new Date(materia.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}).toUpperCase();
+                    
                     card.innerHTML = `
-                        <div class="card-meta">${materia.categoria || 'GERAL'} • ${dataFormatada} • ${materia.autor || 'Redação'}</div>
+                        <small>${(materia.categoria || 'DAHJ').toUpperCase()} • ${data}</small>
                         <h2>${materia.titulo}</h2>
-                        <div class="card-body">${marked.parse(materia.conteudo || "")}</div>
+                        <div>${marked.parse(materia.conteudo || "")}</div>
                     `;
                     feed.appendChild(card);
                 });
             } catch (e) {
-                feed.innerHTML = '<div class="card">Erro ao conectar com o servidor de notícias.</div>';
+                feed.innerHTML = '<div class="card">Erro ao carregar matérias.</div>';
             }
         }
-
         window.onload = () => carregarMaterias('all');
     </script>
 </body>
