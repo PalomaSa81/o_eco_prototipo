@@ -12,34 +12,22 @@ const messaging = firebase.messaging();
 
 // GESTOR DE SEGUNDO PLANO
 messaging.onBackgroundMessage((payload) => {
-    console.log("Recebido:", payload);
-    
-    // Se o payload já tem notification, o Firebase vai tentar exibir.
-    // Para evitar que o 'App' e o 'Chrome' exibam juntos, a TAG é vital.
-    if (payload.notification) {
-        return; 
-    }
+    // Se a notificação já veio pronta (como configuramos no Apps Script),
+    // o navegador vai usar a TAG para unificar.
+    console.log("Notificação recebida:", payload);
 });
 
-// O SEGREDO ESTÁ AQUI: Gerenciar o clique e as janelas
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-
     const urlParaAbrir = 'https://palomasa81.github.io/o_eco_prototipo/';
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((windowClients) => {
-                // 1. Verifica se o site/app já está aberto
                 for (let client of windowClients) {
-                    if (client.url === urlParaAbrir && 'focus' in client) {
-                        return client.focus();
-                    }
+                    if (client.url === urlParaAbrir && 'focus' in client) return client.focus();
                 }
-                // 2. Se não estiver aberto, abre uma nova janela (ou o app)
-                if (clients.openWindow) {
-                    return clients.openWindow(urlParaAbrir);
-                }
+                if (clients.openWindow) return clients.openWindow(urlParaAbrir);
             })
     );
 });
