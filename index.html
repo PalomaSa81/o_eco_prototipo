@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O Eco! - Jornal do DAHJ</title>
-    <link rel="stylesheet" href="style.css"> <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffffff">
+    <style>
+        /* Estilo minimalista embutido para garantir que o site funcione sem arquivos externos */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; }
+        header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #222; margin-bottom: 30px; }
+        h1 { margin: 0; font-size: 2.5rem; }
+        .card { background: white; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; border-left: 5px solid #222; }
+        .card h2 { margin-top: 0; color: #000; }
+        .card small { color: #777; font-weight: bold; }
+        #lista-artigos { max-width: 700px; margin: 0 auto; }
+        .status-msg { text-align: center; color: #666; font-style: italic; }
+    </style>
 </head>
 <body>
 
@@ -15,14 +26,14 @@
     </header>
 
     <main id="lista-artigos">
-        <p>A carregar as últimas notícias...</p>
+        <p class="status-msg">Buscando atualizações na UFF...</p>
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 
     <script>
-        // 1. CONFIGURAÇÃO DO SEU FIREBASE
+        // 1. CONFIGURAÇÃO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
             projectId: "dahj-hub",
@@ -33,69 +44,61 @@
         firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
 
-        // 2. URL DO SEU DEPLOY (WEB APP) DO APPS SCRIPT
-        // IMPORTANTE: Substitua pelo link que obteve no "Nova Implantação"
+        // 2. URL DO SEU APPS SCRIPT
         const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
-        // 3. FUNÇÃO PARA ENVIAR O TOKEN PARA A PLANILHA
+        // 3. REGISTRAR TOKEN NA PLANILHA
         function registrarTokenNoServidor(token) {
-            console.log("A registar o seu dispositivo no jornal...");
-            
             fetch(URL_APPS_SCRIPT, {
                 method: 'POST',
-                mode: 'no-cors', // Fundamental para sites estáticos
+                mode: 'no-cors', 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: token })
-            })
-            .then(() => console.log("Pronto! Já faz parte da lista de leitores."))
-            .catch(err => console.error("Erro ao registar token:", err));
+            }).then(() => console.log("Token registrado."));
         }
 
-        // 4. SOLICITAR PERMISSÃO E GERAR TOKEN
+        // 4. INICIALIZAR NOTIFICAÇÕES
         function inicializarNotificacoes() {
             messaging.getToken({ 
-                vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' // Pegue na aba Cloud Messaging do Firebase
+                vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
             })
             .then((currentToken) => {
-                if (currentToken) {
-                    registrarTokenNoServidor(currentToken);
-                } else {
-                    console.warn('Permissão negada ou token não gerado.');
-                }
+                if (currentToken) registrarTokenNoServidor(currentToken);
             })
-            .catch((err) => {
-                console.error('Erro ao processar notificações:', err);
-            });
+            .catch((err) => console.log('Erro ao obter token:', err));
         }
 
-        // 5. REGISTO DO SERVICE WORKER E INICIALIZAÇÃO
+        // 5. SERVICE WORKER
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
-            .then((registration) => {
-                console.log('Service Worker ativo:', registration.scope);
-                // Após o SW registar, tentamos obter o token
+            .then((reg) => {
+                console.log('SW ativo');
                 inicializarNotificacoes();
             });
         }
 
-        // 6. LÓGICA PARA CARREGAR OS ARTIGOS (Sua função doGet do Apps Script)
+        // 6. CARREGAR ARTIGOS (Lógica para não travar a tela)
         function carregarArtigos() {
-            fetch(URL_APPS_SCRIPT)
+            fetch(URL_APPS_SCRIPT, { redirect: "follow" })
             .then(res => res.json())
             .then(artigos => {
                 const container = document.getElementById('lista-artigos');
-                if (artigos.length === 0) {
-                    container.innerHTML = "<p>Nenhuma notícia encontrada.</p>";
+                if (!artigos || artigos.length === 0) {
+                    container.innerHTML = "<p class='status-msg'>Nenhum artigo publicado ainda.</p>";
                     return;
                 }
                 
                 container.innerHTML = artigos.map(art => `
-                    <article class="card">
+                    <div class="card">
                         <h2>${art.titulo}</h2>
-                        <small>Por ${art.autor} em ${new Date(art.data).toLocaleDateString()}</small>
-                        <p>${art.conteudo.substring(0, 150)}...</p>
-                    </article>
+                        <small>Por ${art.autor} | ${new Date(art.data).toLocaleDateString()}</small>
+                        <p>${art.conteudo}</p>
+                    </div>
                 `).join('');
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('lista-artigos').innerHTML = "<p class='status-msg'>Erro ao carregar notícias. Verifique a conexão.</p>";
             });
         }
 
