@@ -9,39 +9,18 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
 
-// Força o SW a atualizar na hora
-self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', () => clients.claim());
-
-// O QUE RESOLVE O SININHO: Ouvinte de Push nativo
-self.addEventListener('push', function(event) {
-  let data = {};
-  if (event.data) {
-    try {
-      // No FCM V1, o JSON vem com um objeto 'data' dentro
-      const msg = event.data.json();
-      data = msg.data || msg; 
-    } catch (e) {
-      console.error("Erro ao ler JSON", e);
-    }
-  }
-
-  const title = data.title || "Novo no O Eco!";
-  const options = {
-    body: data.body || "Confira a nova matéria publicada.",
-    icon: 'logo-dahj.jpg',
-    badge: 'logo-dahj.jpg',
-    tag: 'dahj-notificacao-unica',
-    data: { url: 'https://dahj-uff.github.io/o-eco/' }
-  };
-
-  // OBRIGATÓRIO: event.waitUntil garante que a notificação apareça 
-  // antes do Android desistir e mostrar o sininho genérico
-  event.waitUntil(self.registration.showNotification(title, options));
+// Ontem, deixamos isso vazio ou apenas com um log. 
+// O Firebase SDK já gerencia a exibição se o GAS mandar o objeto 'notification'
+messaging.onBackgroundMessage((payload) => {
+  console.log('[sw.js] Notificação recebida e tratada pelo Firebase SDK.', payload);
 });
 
+// Isso garante que ao clicar, ele abra o site do DAHJ
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  event.waitUntil(clients.openWindow(event.notification.data.url));
+  event.waitUntil(
+    clients.openWindow('https://dahj-uff.github.io/o-eco/')
+  );
 });
