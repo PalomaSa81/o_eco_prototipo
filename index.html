@@ -122,7 +122,7 @@
             appId: "1:964532263352:web:fe3d32318ed86be611d74d"
         };
 
-        // ATENÇÃO: Verifique se esta é a URL de deploy mais recente
+        // Mantenha essa URL do seu último deploy no GAS
         const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
         firebase.initializeApp(firebaseConfig);
@@ -140,15 +140,16 @@
                             console.log("Token gerado:", token);
                             enviarTokenParaServidor(token);
                         }
+                    }).catch((err) => {
+                        console.log('Erro ao obter token FCM:', err);
                     });
                 });
             });
         }
 
-        // Função corrigida para evitar erros de CORS do Google
+        // Truque do GET para evitar CORS
         function enviarTokenParaServidor(token) {
             const urlFinal = URL_API_DRIVE + "?token=" + encodeURIComponent(token);
-            // Truque da imagem: o navegador faz a requisição GET sem travar no CORS
             const img = new Image();
             img.src = urlFinal;
             console.log("Token enviado para sincronização automática.");
