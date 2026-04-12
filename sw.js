@@ -1,6 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
+// 1. Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
   projectId: "dahj-hub",
@@ -11,23 +12,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// SOLUÇÃO PARA NOTIFICAÇÃO DUPLICADA:
-// O onBackgroundMessage intercepta a chegada e nós controlamos a exibição
+// 2. Forçar a atualização imediata do Service Worker
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Faz este SW virar o ativo imediatamente
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim()); // Assume o controle das abas abertas na hora
+});
+
+// 3. Processar a mensagem recebida (formato 'data' do GAS)
 messaging.onBackgroundMessage((payload) => {
   console.log('[sw.js] Mensagem recebida:', payload);
 
-  // Se a notificação já foi processada pelo SO, a gente não força outra
-  if (payload.notification) {
-    const notificationTitle = payload.notification.title || "O Eco!";
+  // Verificamos se os dados vieram no campo 'data' (estratégia anti-duplicata)
+  if (payload.data) {
+    const notificationTitle = payload.data.title || "O Eco!";
     const notificationOptions = {
-      body: payload.notification.body || "Nova atualização disponível",
-      icon: 'logo-dahj.jpg',
+      body: payload.data.body || "Nova atualização disponível",
+      icon: 'logo-dahj.jpg', // Certifique-se que este arquivo está na raiz do GitHub
       badge: 'logo-dahj.jpg',
-      // O 'tag' é o segredo: notificações com a mesma tag se sobrescrevem 
-      // em vez de criar várias entradas na tela do celular
-      tag: 'dahj-notificacao-unica', 
+      tag: 'dahj-notificacao-unica', // Evita que apareçam várias notificações
       data: {
-        url: 'https://dahj-uff.github.io/o-eco/' // Link para abrir ao clicar
+        url: 'https://dahj-uff.github.io/o-eco/'
       }
     };
 
@@ -35,10 +42,21 @@ messaging.onBackgroundMessage((payload) => {
   }
 });
 
-// Opcional: Faz a notificação abrir o site ao ser clicada
+// 4. Ação ao clicar na notificação (Abrir o site)
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow(event.notification.data.url)
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Se o site já estiver aberto, foca nele. Se não, abre nova aba.
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url === event.notification.data.url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(event.notification.data.url);
+      }
+    })
   );
 });
