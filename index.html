@@ -1,118 +1,230 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Eco! - Jornal do DAHJ</title>
+    <title>O Eco! - JORNAL DO DAHJ</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#003366">
+    <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
     <link rel="apple-touch-icon" href="logo-dahj.jpg">
+    <meta name="theme-color" content="#001f4d">
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --primary: #003366; --bg: #f0f2f5; --white: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: var(--bg); }
-        header { 
-            background: linear-gradient(rgba(0,51,102,0.85), rgba(0,51,102,0.85)), url('capa-chapa.jpg') center/cover;
-            color: white; padding: 50px 20px; text-align: center; 
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
+
+        :root {
+            --azul-dahj: #001f4d; 
+            --azul-botao: #00265e; 
+            --amarelo: #FFD700;
+            --bg: #f4f4f4;
+            --branco: #ffffff;
+            --ruido: rgba(100, 100, 100, 0.4);
         }
-        header img { width: 70px; border-radius: 50%; border: 2px solid white; margin-bottom: 10px; }
-        .container { max-width: 700px; margin: -30px auto 50px; padding: 0 15px; }
+
+        /* --- MARCA D'ÁGUA --- */
+        body::before {
+            content: "MODELO PARA APRESENTAÇÃO • CONTEÚDO FICTÍCIO • MODELO PARA APRESENTAÇÃO";
+            position: fixed; top: 0; width: 100%; background: #e0e0e0;
+            color: #777; font-size: 10px; text-align: center; letter-spacing: 2px;
+            z-index: 9999; padding: 3px 0; font-weight: bold; border-bottom: 1px solid #ccc;
+        }
+
+        .carimbo-exemplo {
+            position: fixed; bottom: 80px; right: -30px; transform: rotate(-45deg);
+            border: 4px double var(--ruido); color: var(--ruido);
+            padding: 10px 50px; font-size: 2rem; font-weight: bold;
+            text-transform: uppercase; z-index: 9998; pointer-events: none; opacity: 0.6;
+        }
+
+        body { 
+            margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
+            background: var(--bg); color: #333; display: flex; flex-direction: column; min-height: 100vh;
+            padding-top: 18px; 
+        }
+
+        header {
+            width: 100%; padding: 60px 0; text-align: center;
+            background: linear-gradient(rgba(0,31,77,0.7), rgba(0,31,77,0.7)), url('bk0.png') no-repeat center center; 
+            background-size: cover; border-bottom: 5px solid var(--amarelo);
+        }
+
+        .logo-dahj { width: 100px; border-radius: 50%; border: 2px solid var(--amarelo); }
+        header h1 { 
+            color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0; letter-spacing: 2px;
+        }
+
+        .filter-bar {
+            background: var(--azul-dahj); padding: 12px;
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+            position: sticky; top: 18px; z-index: 1000;
+        }
+
+        .filter-btn {
+            background: var(--azul-botao); border: none; color: var(--branco);
+            padding: 8px 20px; border-radius: 4px; cursor: pointer; 
+            font-size: 0.8rem; font-weight: bold; text-transform: uppercase; transition: 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active { background: var(--amarelo); color: var(--azul-dahj); }
+
+        .container { max-width: 1100px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
+        
         .card { 
-            background: var(--white); border-radius: 12px; padding: 25px; margin-bottom: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 6px solid var(--primary);
+            background: var(--white); background-color: white; padding: 25px; border-radius: 4px; margin-bottom: 15px;
+            border-left: 5px solid var(--azul-dahj); display: flex; flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .card h2 { margin: 0 0 10px; color: var(--primary); font-size: 1.6rem; }
-        .card-meta { font-size: 0.85rem; color: #666; margin-bottom: 15px; display: flex; gap: 15px; }
-        .card-body { line-height: 1.6; color: #333; }
-        .btn-refresh { 
-            position: fixed; bottom: 20px; right: 20px; background: var(--primary); 
-            color: white; border: none; width: 55px; height: 55px; border-radius: 50%; 
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+
+        .card h2 { margin: 10px 0 5px 0; font-size: 1.4rem; color: var(--azul-dahj); }
+        .card-meta { font-size: 0.75rem; color: #777; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        
+        /* Cores por Categoria */
+        .cat-aluno { border-left-color: #00b894; }
+        .cat-prof { border-left-color: #6c5ce7; }
+        .cat-conv { border-left-color: #e17055; }
+        .cat-dahj { border-left-color: var(--azul-dahj); }
+
+        .btn-side {
+            display: block; background: var(--azul-botao); color: white;
+            text-align: center; padding: 15px; text-decoration: none; font-weight: bold;
+            border-radius: 4px; margin-bottom: 10px; transition: 0.3s;
         }
-        #debug-token { font-size: 10px; word-break: break-all; padding: 20px; color: #666; background: #eee; margin: 20px; border-radius: 8px; border: 1px dashed #ccc; }
+        .btn-side:hover { background: var(--amarelo); color: var(--azul-dahj); }
+
+        #debug-token { font-size: 9px; word-break: break-all; padding: 10px; color: #999; text-align: center; }
+
+        footer { margin-top: auto; padding: 50px 0 20px 0; text-align: center; width: 100%; background-color: var(--branco); }
+        .img-chapa-footer { width: 100px; }
+
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+            header h1 { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="logo-dahj.jpg" alt="DAHJ">
-    <h1>O Eco!</h1>
-    <p>Informativo Digital da Economia UFF</p>
-</header>
+    <div class="carimbo-exemplo">SEM VALOR</div>
 
-<div class="container" id="feed">
-    <div style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando...</div>
-</div>
+    <header>
+        <img src="logo-dahj.jpg" alt="DAHJ" class="logo-dahj">
+        <h1>O Eco!</h1>
+    </header>
 
-<button class="btn-refresh" onclick="carregarMaterias()"><i class="fas fa-sync-alt fa-lg"></i></button>
+    <nav class="filter-bar">
+        <button class="filter-btn active" onclick="carregarMaterias('all')">Tudo</button>
+        <button class="filter-btn" onclick="carregarMaterias('dahj')">DAHJ</button>
+        <button class="filter-btn" onclick="carregarMaterias('aluno')">Aluno</button>
+        <button class="filter-btn" onclick="carregarMaterias('prof')">Professor</button>
+    </nav>
 
-<div id="debug-token">Aguardando Token...</div>
+    <div class="container">
+        <main id="feed">
+            <div style="text-align:center; padding:50px;"><i class="fas fa-spinner fa-spin"></i> Sincronizando com o Bloco F...</div>
+        </main>
 
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
+        <aside>
+            <a href="https://dahj-uff.github.io/ouvidoria/" class="btn-side">OUVIDORIA</a>
+            <a href="#" class="btn-side" style="opacity: 0.7;">GUIA DO CALOURO</a>
+            <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj);">
+                <strong>Aviso de Protótipo:</strong><br>
+                Sistema de notificações ativado via Firebase Cloud Messaging.
+            </div>
+            <div id="debug-token">Carregando identificador...</div>
+        </aside>
+    </div>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
-        authDomain: "dahj-hub.firebaseapp.com",
-        projectId: "dahj-hub",
-        storageBucket: "dahj-hub.firebasestorage.app",
-        messagingSenderId: "964532263352",
-        appId: "1:964532263352:web:fe3d32318ed86be611d74d"
-    };
+    <footer>
+        <img src="capa-chapa.jpg" alt="Chapa A Luta Faz Eco" class="img-chapa-footer">
+        <div style="font-size: 0.85rem; color: #444; margin: 10px 0; font-weight: bold;">Chapa A Luta Faz Eco 2025-2026</div>
+        <div style="font-size: 0.7rem; color: #999;">© A Luta Faz Eco 2026 | Economia UFF</div>
+    </footer>
 
-    const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
 
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
+            authDomain: "dahj-hub.firebaseapp.com",
+            projectId: "dahj-hub",
+            storageBucket: "dahj-hub.firebasestorage.app",
+            messagingSenderId: "964532263352",
+            appId: "1:964532263352:web:fe3d32318ed86be611d74d"
+        };
 
-    // SILENCIADOR DE PRIMEIRO PLANO
-    messaging.onMessage((payload) => {
-        console.log('Site aberto: Silenciando notificação visual para evitar duplicata.');
-        // Opcional: recarregar as matérias automaticamente quando chegar notícia
-        carregarMaterias();
-    });
+        const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then((registration) => {
-                messaging.getToken({ 
-                    serviceWorkerRegistration: registration,
-                    vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
-                }).then((token) => {
-                    if (token) {
-                        document.getElementById('debug-token').innerHTML = "<strong>Token Atualizado:</strong><br>" + token;
-                    }
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        // Evita duplicidade em primeiro plano
+        messaging.onMessage((payload) => {
+            console.log('Notificação recebida com site aberto. Atualizando feed...');
+            carregarMaterias('all');
+        });
+
+        // Registro do Service Worker e Token
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then((registration) => {
+                    messaging.getToken({ 
+                        serviceWorkerRegistration: registration,
+                        vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
+                    }).then((token) => {
+                        if (token) {
+                            document.getElementById('debug-token').innerText = "ID de Push Ativo";
+                            console.log("Token:", token);
+                        }
+                    });
                 });
             });
-        });
-    }
-
-    async function carregarMaterias() {
-        const feed = document.getElementById('feed');
-        try {
-            const response = await fetch(URL_API_DRIVE + "?t=" + Date.now());
-            const materias = await response.json();
-            feed.innerHTML = '';
-            materias.forEach(materia => {
-                const card = document.createElement('article');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="card-meta">
-                        <span><i class="far fa-calendar-alt"></i> ${new Date(materia.data).toLocaleDateString()}</span>
-                        <span><i class="far fa-user"></i> ${materia.autor}</span>
-                    </div>
-                    <h2>${materia.titulo}</h2>
-                    <div class="card-body">${marked.parse(materia.conteudo || "")}</div>
-                `;
-                feed.appendChild(card);
-            });
-        } catch (e) {
-            feed.innerHTML = '<div class="card">Erro ao carregar matérias.</div>';
         }
-    }
-    window.onload = carregarMaterias;
-</script>
+
+        async function carregarMaterias(filtro = 'all') {
+            const feed = document.getElementById('feed');
+            
+            // Atualiza botões
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.toLowerCase() === filtro.toLowerCase() || (filtro === 'all' && btn.innerText === 'Tudo')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            try {
+                const response = await fetch(URL_API_DRIVE + "?t=" + Date.now());
+                const materias = await response.json();
+                feed.innerHTML = '';
+
+                const materiasFiltradas = filtro === 'all' ? materias : materias.filter(m => m.categoria === filtro);
+
+                if (materiasFiltradas.length === 0) {
+                    feed.innerHTML = '<div class="card">Nenhuma matéria encontrada nesta categoria.</div>';
+                    return;
+                }
+
+                materiasFiltradas.forEach(materia => {
+                    const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                    const card = document.createElement('article');
+                    card.className = `card cat-${materia.categoria || 'dahj'}`;
+                    card.innerHTML = `
+                        <div class="card-meta">${materia.categoria || 'GERAL'} • ${dataFormatada} • ${materia.autor || 'Redação'}</div>
+                        <h2>${materia.titulo}</h2>
+                        <div class="card-body">${marked.parse(materia.conteudo || "")}</div>
+                    `;
+                    feed.appendChild(card);
+                });
+            } catch (e) {
+                feed.innerHTML = '<div class="card">Erro ao conectar com o servidor de notícias.</div>';
+            }
+        }
+
+        window.onload = () => carregarMaterias('all');
+    </script>
 </body>
 </html>
