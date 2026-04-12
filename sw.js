@@ -1,52 +1,19 @@
-// Nome do cachê (versão do app)
-const CACHE_NAME = 'o-eco-v1';
-const assets = [
-  './',
-  './index.html',
-  './logo-dahj.jpg'
-];
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// Instala o Service Worker e guarda arquivos básicos no cachê
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(assets);
-    })
-  );
+firebase.initializeApp({
+    apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
+    projectId: "dahj-hub",
+    messagingSenderId: "964532263352",
+    appId: "1:964532263352:web:fe3d32318ed86be611d74d"
 });
 
-// Escuta as notificações que chegam do Firebase
-self.addEventListener('push', event => {
-  const data = event.data ? event.data.json() : { title: 'O Eco!', body: 'Nova atualização disponível!' };
-  
-  const options = {
-    body: data.body,
-    icon: 'logo-dahj.jpg', // Ícone que aparece na notificação
-    badge: 'logo-dahj.jpg', // Ícone pequeno da barra de status
-    vibrate: [100, 50, 100],
-    data: {
-      url: data.click_action || '/'
-    }
-  };
+const messaging = firebase.messaging();
 
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-// Faz o celular abrir o site quando o aluno clica na notificação
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url)
-  );
-});
-
-// Responde com arquivos do cachê se estiver sem internet
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
+messaging.onBackgroundMessage((payload) => {
+    const { title, body } = payload.notification;
+    self.registration.showNotification(title, {
+        body: body,
+        icon: 'logo-dahj.jpg'
+    });
 });
