@@ -20,7 +20,6 @@
             --amarelo: #FFD700;
             --bg: #f4f4f4;
             --branco: #ffffff;
-            --ruido: rgba(100, 100, 100, 0.4);
         }
 
         body::before {
@@ -80,8 +79,6 @@
             border-radius: 4px; margin-bottom: 10px;
         }
 
-        footer { margin-top: auto; padding: 50px 0 20px 0; text-align: center; background: var(--branco); }
-
         @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -125,6 +122,7 @@
             appId: "1:964532263352:web:fe3d32318ed86be611d74d"
         };
 
+        // ATENÇÃO: Verifique se esta é a URL de deploy mais recente
         const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
         firebase.initializeApp(firebaseConfig);
@@ -139,22 +137,21 @@
                         vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                     }).then((token) => {
                         if (token) {
-                            console.log("Token gerado");
-                            enviarTokenParaPlanilha(token);
+                            console.log("Token gerado:", token);
+                            enviarTokenParaServidor(token);
                         }
                     });
                 });
             });
         }
 
-        async function enviarTokenParaPlanilha(token) {
-            try {
-                await fetch(URL_API_DRIVE, {
-                    method: 'POST',
-                    mode: 'no-cors', // Importante para o Apps Script
-                    body: JSON.stringify({ token: token })
-                });
-            } catch (e) { console.log("Erro ao salvar token"); }
+        // Função corrigida para evitar erros de CORS do Google
+        function enviarTokenParaServidor(token) {
+            const urlFinal = URL_API_DRIVE + "?token=" + encodeURIComponent(token);
+            // Truque da imagem: o navegador faz a requisição GET sem travar no CORS
+            const img = new Image();
+            img.src = urlFinal;
+            console.log("Token enviado para sincronização automática.");
         }
 
         async function carregarMaterias(filtro = 'all') {
@@ -163,21 +160,31 @@
                 const response = await fetch(URL_API_DRIVE + "?t=" + Date.now());
                 const materias = await response.json();
                 feed.innerHTML = '';
+                
                 const filtradas = filtro === 'all' ? materias : materias.filter(m => m.categoria === filtro);
+
+                if (filtradas.length === 0) {
+                    feed.innerHTML = '<div style="text-align:center; padding:20px;">Nenhuma matéria encontrada.</div>';
+                    return;
+                }
 
                 filtradas.forEach(materia => {
                     const card = document.createElement('article');
                     card.className = `card entidade-${materia.categoria || 'dahj'}`;
-                    const data = new Date(materia.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}).toUpperCase();
+                    const dataFormatada = new Date(materia.data).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}).toUpperCase();
+                    
                     card.innerHTML = `
-                        <small>${(materia.categoria || 'DAHJ').toUpperCase()} • ${data}</small>
+                        <small>${(materia.categoria || 'DAHJ').toUpperCase()} • ${dataFormatada}</small>
                         <h2>${materia.titulo}</h2>
                         <div>${marked.parse(materia.conteudo || "")}</div>
                     `;
                     feed.appendChild(card);
                 });
-            } catch (e) { feed.innerHTML = 'Erro ao carregar.'; }
+            } catch (e) { 
+                feed.innerHTML = '<div style="text-align:center; padding:20px;">Erro ao carregar o feed. Verifique a conexão.</div>'; 
+            }
         }
+
         window.onload = () => carregarMaterias('all');
     </script>
 </body>
