@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', () => clients.claim());
 
-// 3. OUVINTE NATIVO DE PUSH (O Matador de Sininho)
+// 3. OUVINTE NATIVO DE PUSH
 self.addEventListener('push', function(event) {
   console.log('[sw.js] Push recebido!');
   
@@ -28,7 +28,6 @@ self.addEventListener('push', function(event) {
   if (event.data) {
     try {
       const json = event.data.json();
-      // Captura os dados que você configurou no GAS
       const d = json.data || json;
       payload.title = d.title || payload.title;
       payload.body = d.body || payload.body;
@@ -40,14 +39,13 @@ self.addEventListener('push', function(event) {
 
   const options = {
     body: payload.body,
-    icon: 'logo-dahj.jpg',
-    badge: 'logo-dahj.jpg',
-    tag: 'dahj-notificacao-unica', // Garante que só apareça UMA
+    icon: 'logo-dahj.jpg',   // O ícone colorido que aparece na notificação aberta
+    badge: 'badge.png',      // O SEU NOVO ÍCONE VAZADO (A silhueta branca no topo)
+    tag: 'dahj-notificacao-unica',
     renotify: true,
     data: { url: payload.url }
   };
 
-  // O pulo do gato: avisa ao Android para esperar a notificação ser montada
   event.waitUntil(self.registration.showNotification(payload.title, options));
 });
 
@@ -56,7 +54,6 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // Se o site já estiver aberto, foca nele. Se não, abre nova aba.
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url === event.notification.data.url && 'focus' in client) {
