@@ -1,7 +1,6 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// 1. Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDtMO8dbJWXcIdmhCAtvYdxKlntulcYqBI",
   projectId: "dahj-hub",
@@ -10,53 +9,51 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
 
-// 2. Forçar a atualização imediata do Service Worker
-self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Faz este SW virar o ativo imediatamente
-});
+// 1. Forçar atualização imediata
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', () => clients.claim());
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim()); // Assume o controle das abas abertas na hora
-});
-
-// 3. Processar a mensagem recebida (formato 'data' do GAS)
-messaging.onBackgroundMessage((payload) => {
-  console.log('[sw.js] Mensagem recebida:', payload);
-
-  // Verificamos se os dados vieram no campo 'data' (estratégia anti-duplicata)
-  if (payload.data) {
-    const notificationTitle = payload.data.title || "O Eco!";
-    const notificationOptions = {
-      body: payload.data.body || "Nova atualização disponível",
-      icon: 'logo-dahj.jpg', // Certifique-se que este arquivo está na raiz do GitHub
-      badge: 'logo-dahj.jpg',
-      tag: 'dahj-notificacao-unica', // Evita que apareçam várias notificações
-      data: {
-        url: 'https://dahj-uff.github.io/o-eco/'
-      }
-    };
-
-    return self.registration.showNotification(notificationTitle, notificationOptions);
+// 2. O SEGREDO: Ouvinte nativo de Push (Mais rápido que o do Firebase)
+self.addEventListener('push', function(event) {
+  console.log('[sw.js] Push recebido!');
+  
+  let data = {};
+  if (event.data) {
+    try {
+      // O FCM V1 entrega os dados dentro de um objeto 'data'
+      const payload = event.data.json();
+      data = payload.data || payload; 
+    } catch (e) {
+      console.error("Erro ao ler JSON do push", e);
+    }
   }
+
+  const title = data.title || "Novo no O Eco!";
+  const options = {
+    body: data.body || "Confira as novidades no portal.",
+    icon: 'logo-dahj.jpg',
+    badge: 'logo-dahj.jpg',
+    tag: 'dahj-notificacao-unica',
+    renotify: true, // Faz o celular vibrar de novo se chegar outra
+    data: {
+      url: 'https://dahj-uff.github.io/o-eco/'
+    }
+  };
+
+  // Aqui dizemos para o navegador: "Não mostre o sininho genérico, use a MINHA notificação"
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// 4. Ação ao clicar na notificação (Abrir o site)
+// 3. Ação de clique
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // Se o site já estiver aberto, foca nele. Se não, abre nova aba.
-      for (var i = 0; i < windowClients.length; i++) {
-        var client = windowClients[i];
-        if (client.url === event.notification.data.url && 'focus' in client) {
-          return client.focus();
-        }
+      for (let client of windowClients) {
+        if (client.url === event.notification.data.url && 'focus' in client) return client.focus();
       }
-      if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
-      }
+      if (clients.openWindow) return clients.openWindow(event.notification.data.url);
     })
   );
 });
