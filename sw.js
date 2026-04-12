@@ -10,12 +10,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Mostra a notificação quando o app está em segundo plano
+// GESTOR DE NOTIFICAÇÕES EM SEGUNDO PLANO
 messaging.onBackgroundMessage((payload) => {
-    console.log("Mensagem recebida em segundo plano:", payload);
-    const notificationTitle = payload.notification.title;
+    console.log("Recebido em segundo plano:", payload);
+    
+    // Extrai os dados enviados pelo Apps Script
+    const notificationTitle = payload.notification.title || "O Eco! - DAHJ";
     const notificationOptions = {
-        body: payload.notification.body,
+        body: payload.notification.body || "Nova matéria disponível!",
         icon: 'logo-dahj.jpg',
         badge: 'logo-dahj.jpg',
         data: {
@@ -23,10 +25,9 @@ messaging.onBackgroundMessage((payload) => {
         }
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Faz o celular abrir o site ao clicar na notificação
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     event.waitUntil(
