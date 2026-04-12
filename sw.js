@@ -10,10 +10,26 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Mostra a notificação quando o app está em segundo plano
 messaging.onBackgroundMessage((payload) => {
-    const { title, body } = payload.notification;
-    self.registration.showNotification(title, {
-        body: body,
-        icon: 'logo-dahj.jpg'
-    });
+    console.log("Mensagem recebida em segundo plano:", payload);
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: 'logo-dahj.jpg',
+        badge: 'logo-dahj.jpg',
+        data: {
+            url: 'https://palomasa81.github.io/o_eco_prototipo/'
+        }
+    };
+
+    self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// Faz o celular abrir o site ao clicar na notificação
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url)
+    );
 });
