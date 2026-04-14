@@ -2,22 +2,22 @@
   "name": "Diretório Acadêmico Hermann Júnior",
   "short_name": "DAHJ",
   "description": "Plataforma oficial dos estudantes de Economia da UFF - Bloco F.",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#001f4d",
   "theme_color": "#001f4d",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "logo-dahj.jpg",
+      "src": "logo-dahj.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "logo-dahj.jpg",
+      "src": "logo-dahj.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
