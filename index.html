@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O Eco! - PROTÓTIPO</title>
+    
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/jpeg" href="logo-dahj.jpg">
-    <link rel="apple-touch-icon" href="logo-dahj.jpg">
+    <meta name="theme-color" content="#001f4d">
+    <link rel="icon" type="image/png" href="logo-dahj.png">
+    <link rel="apple-touch-icon" href="logo-dahj.png">
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -37,7 +39,8 @@
 
         header {
             width: 100%; padding: 60px 0; text-align: center;
-            background: url('bk0.png') no-repeat center center; 
+            /* Atualizado para webp conforme sua mudança */
+            background: url('bk0.webp') no-repeat center center; 
             background-size: cover; border-bottom: 5px solid var(--amarelo);
         }
 
@@ -85,7 +88,7 @@
 <body>
 
     <header>
-        <img src="logo-dahj.jpg" alt="DAHJ" class="logo-dahj">
+        <img src="logo-dahj.png" alt="DAHJ" class="logo-dahj">
         <h1>O Eco!</h1>
     </header>
 
@@ -122,7 +125,6 @@
             appId: "1:964532263352:web:fe3d32318ed86be611d74d"
         };
 
-        // Mantenha essa URL do seu último deploy no GAS
         const URL_API_DRIVE = "https://script.google.com/macros/s/AKfycbymHs-93cO2OXZz4F8vSFBI8op0EokqkOCD7iuByEbAsaJz4LuOhqmNQZvVvWLEqvg/exec";
 
         firebase.initializeApp(firebaseConfig);
@@ -132,27 +134,36 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then((registration) => {
+                    console.log("Service Worker registrado com sucesso.");
+                    
+                    // Solicita permissão e pega o token
                     messaging.getToken({ 
                         serviceWorkerRegistration: registration,
                         vapidKey: 'BG3IO3TVoOS_rc9fyJiwjOXQBhcVonLq-yRNWXsafpjWkuFa5nZM8QXPOKYwq_7WN7DmOBa11PQNNqkW9qz6qCE' 
                     }).then((token) => {
                         if (token) {
-                            console.log("Token gerado:", token);
                             enviarTokenParaServidor(token);
                         }
                     }).catch((err) => {
-                        console.log('Erro ao obter token FCM:', err);
+                        console.log('Erro ao obter token:', err);
                     });
+                }).catch((err) => {
+                    console.error("Falha ao registrar Service Worker:", err);
                 });
             });
         }
 
-        // Truque do GET para evitar CORS
+        // Função otimizada para enviar o token sem bloquear o navegador
         function enviarTokenParaServidor(token) {
             const urlFinal = URL_API_DRIVE + "?token=" + encodeURIComponent(token);
-            const img = new Image();
-            img.src = urlFinal;
-            console.log("Token enviado para sincronização automática.");
+            
+            // Usando fetch no-cors para evitar problemas de bloqueio e keepalive para garantir o envio
+            fetch(urlFinal, { 
+                mode: 'no-cors',
+                keepalive: true 
+            }).then(() => {
+                console.log("Token sincronizado.");
+            }).catch(e => console.log("Erro ao sincronizar token via fetch."));
         }
 
         async function carregarMaterias(filtro = 'all') {
@@ -182,7 +193,7 @@
                     feed.appendChild(card);
                 });
             } catch (e) { 
-                feed.innerHTML = '<div style="text-align:center; padding:20px;">Erro ao carregar o feed. Verifique a conexão.</div>'; 
+                feed.innerHTML = '<div style="text-align:center; padding:20px;">Erro ao carregar o feed.</div>'; 
             }
         }
 
