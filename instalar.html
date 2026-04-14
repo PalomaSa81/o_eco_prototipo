@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalador O Eco! - DAHJ</title>
+    <link rel="stylesheet" href="style.css"> <link rel="manifest" href="manifest.json">
+    <style>
+        .lp-container { max-width: 600px; margin: 40px auto; padding: 20px; text-align: center; }
+        .card-seguranca { background: #f4f4f4; padding: 15px; border-radius: 8px; text-align: left; margin: 20px 0; border-left: 5px solid var(--azul-dahj); }
+        .btn-instalar { background: var(--amarelo); color: var(--azul-dahj); padding: 15px 30px; border: none; border-radius: 5px; font-weight: bold; font-size: 1.1em; cursor: pointer; width: 100%; display: none; }
+        .status-badge { font-size: 0.8em; color: green; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="lp-container">
+    <img src="logo-dahj.png" alt="Logo DAHJ" width="120">
+    <h1>O Eco! no seu celular</h1>
+    <p>Acompanhe a transparência e as notícias da UFF em tempo real.</p>
+
+    <div class="card-seguranca">
+        <h3>Segurança e Transparência</h3>
+        <p><strong>Auditoria:</strong> Nosso código é aberto. Qualquer estudante pode inspecionar o <code>sw.js</code> e o <code>manifest.json</code> no nosso GitHub.</p>
+        <p><strong>Dados:</strong> Não coletamos informações pessoais. O "token" gerado é anônimo e serve apenas para o Firebase enviar as notícias do Bloco F até você.</p>
+        <p><strong>Leveza:</strong> Por ser um PWA, ele ocupa menos de 1MB e não gasta bateria em segundo plano.</p>
+    </div>
+
+    <button id="btn-instalar-lp" class="btn-instalar">
+        📥 INSTALAR APLICATIVO
+    </button>
+    
+    <p id="msg-instalação" style="color: #666; font-size: 0.9em; margin-top: 20px;">
+        Se o botão não aparecer, clique nos três pontinhos do navegador e selecione "Adicionar à tela inicial".
+    </p>
+</div>
+
+<script>
+    let deferredPrompt;
+    const btn = document.getElementById('btn-instalar-lp');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        btn.style.display = 'block'; // Mostra o botão apenas se for possível instalar
+    });
+
+    btn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                btn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
+
+    // Se já estiver instalado, avisa o usuário
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        document.querySelector('h1').innerText = "O Eco! já está instalado";
+        btn.style.display = 'none';
+        document.getElementById('msg-instalação').innerText = "Você já está usando a versão oficial do App.";
+    }
+</script>
+</body>
+</html>
