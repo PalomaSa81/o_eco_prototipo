@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Eco! - FAQ & AJUDA</title>
+    
+    <link rel="icon" type="image/png" href="logo-dahj.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap');
+
+        :root {
+            --azul-dahj: #001f4d; 
+            --azul-botao: #00265e; 
+            --amarelo: #FFD700;
+            --bg: #f4f4f4;
+            --branco: #ffffff;
+        }
+
+        body::before {
+            content: "CENTRAL DE AJUDA DISCENTE • DAHJ 2026";
+            position: fixed; top: 0; width: 100%; background: #e0e0e0;
+            color: #777; font-size: 10px; text-align: center; z-index: 9999; padding: 3px 0; font-weight: bold;
+        }
+
+        body { 
+            margin: 0; font-family: 'IBM Plex Sans', sans-serif; 
+            background: var(--bg); color: #333;
+            display: flex; flex-direction: column; min-height: 100vh;
+            padding-top: 18px; 
+        }
+
+        header {
+            width: 100%; padding: 60px 0; text-align: center;
+            background: url('bk0.webp') no-repeat center center; 
+            background-size: cover; border-bottom: 5px solid var(--amarelo);
+        }
+
+        .logo-dahj { width: 100px; }
+        
+        header h1 { 
+            color: var(--amarelo); text-transform: uppercase; font-size: 3.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 15px 0 0 0;
+        }
+
+        /* Barra de Busca (Mesmo estilo da Nav do Jornal) */
+        .search-bar {
+            background: var(--azul-dahj); padding: 12px;
+            display: flex; justify-content: center;
+            position: sticky; top: 18px; z-index: 1000;
+        }
+
+        .search-input {
+            width: 90%; max-width: 800px; padding: 10px 20px;
+            border-radius: 4px; border: none; font-size: 1rem;
+            font-family: 'IBM Plex Sans', sans-serif; outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .container { max-width: 1100px; margin: 20px auto; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
+        
+        /* Card de FAQ estilizado como o Card de Matéria */
+        .card { 
+            background: var(--branco); padding: 25px; border-radius: 4px; margin-bottom: 15px;
+            border-left: 5px solid var(--azul-dahj);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .card small { color: #888; text-transform: uppercase; font-weight: bold; font-size: 0.75rem; }
+        .card h2 { margin: 10px 0; color: var(--azul-dahj); font-size: 1.5rem; }
+        .card p { line-height: 1.6; color: #444; margin-bottom: 15px; }
+        
+        .tags-faq {
+            display: inline-block; background: #f0f0f0; padding: 4px 10px;
+            border-radius: 4px; font-size: 0.7rem; color: #555; font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-side {
+            display: block; background: var(--azul-botao); color: white;
+            text-align: center; padding: 15px; text-decoration: none; font-weight: bold;
+            border-radius: 4px; margin-bottom: 10px; transition: 0.3s;
+        }
+
+        .btn-side:hover { background: #003a8c; color: var(--amarelo); }
+        .btn-active { background: var(--amarelo) !important; color: var(--azul-dahj) !important; }
+
+        .link-doc {
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 15px;
+            color: #2980b9; text-decoration: none; font-weight: bold; font-size: 0.85rem;
+        }
+
+        @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo-dahj.png" alt="DAHJ" class="logo-dahj">
+        <h1>O Eco!</h1>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="busca" class="search-input" placeholder="Pesquisar na base de conhecimento (ex: VS, Calendário, Disciplina)...">
+    </div>
+
+    <div class="container">
+        <main id="feed-faq">
+            <div style="text-align:center; padding:50px; color:#666;">
+                <i class="fas fa-spinner fa-spin"></i> Sincronizando dados acadêmicos...
+            </div>
+        </main>
+
+        <aside>
+            <a href="index.html" class="btn-side">O ECO! (NOTÍCIAS)</a>
+            
+            <a href="faq.html" class="btn-side btn-active">FAQ / AJUDA</a>
+            
+            <a href="https://dahj-uff.github.io/ouvidoria/" class="btn-side">OUVIDORIA</a>
+            
+            <div style="background: var(--branco); padding: 15px; border-radius: 4px; font-size: 0.8rem; border-top: 3px solid var(--azul-dahj); margin-top: 10px;">
+                <strong>Como funciona a busca?</strong><br>
+                Nosso sistema utiliza relevância vetorial para encontrar a resposta mais próxima da sua dúvida.
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let faqDados = [];
+
+        // Carrega o JSON de perguntas
+        async function carregarFAQ() {
+            const feed = document.getElementById('feed-faq');
+            try {
+                const response = await fetch('dados.json');
+                faqDados = await response.json();
+                renderizar(faqDados);
+            } catch (e) {
+                feed.innerHTML = '<div style="text-align:center; padding:20px;">Erro ao carregar banco de dados.</div>';
+            }
+        }
+
+        function calcularRelevancia(textoAlvo, termoBusca) {
+            if (!termoBusca) return 0;
+            const tokensAlvo = textoAlvo.toLowerCase().split(/[\s,.-]+/);
+            const tokensBusca = termoBusca.toLowerCase().split(/[\s,.-]+/);
+            let score = 0;
+            tokensBusca.forEach(token => {
+                if (token.length < 2) return;
+                if (tokensAlvo.includes(token)) {
+                    score += 3; 
+                } else {
+                    tokensAlvo.forEach(p => { if (p.startsWith(token)) score += 1; });
+                }
+            });
+            return score;
+        }
+
+        function renderizar(itens) {
+            const feed = document.getElementById('feed-faq');
+            if (itens.length === 0) {
+                feed.innerHTML = '<div style="text-align:center; padding:40px;">Nenhuma informação encontrada para este termo.</div>';
+                return;
+            }
+
+            feed.innerHTML = itens.map(item => `
+                <article class="card">
+                    <small>${item.documento}</small>
+                    <h2>${item.pergunta}</h2>
+                    <p>${item.resposta}</p>
+                    <div class="tags-faq"># ${item.tags.split(',').join(' #')}</div>
+                    ${item.link ? `
+                        <br><a href="${item.link}" target="_blank" class="link-doc">
+                            <i class="fas fa-file-pdf"></i> Ver Documento Completo
+                        </a>
+                    ` : ''}
+                </article>
+            `).join('');
+        }
+
+        document.getElementById('busca').addEventListener('input', (e) => {
+            const termo = e.target.value.trim();
+            if (!termo) {
+                renderizar(faqDados);
+                return;
+            }
+
+            const resultados = faqDados.map(item => {
+                const peso = calcularRelevancia(item.pergunta + " " + item.tags + " " + item.resposta, termo);
+                return { ...item, score: peso };
+            }).filter(i => i.score > 0).sort((a, b) => b.score - a.score);
+
+            renderizar(resultados);
+        });
+
+        window.onload = carregarFAQ;
+    </script>
+</body>
+</html>
